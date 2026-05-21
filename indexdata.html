@@ -176,14 +176,16 @@
             document.getElementById('infoModal').classList.add('hidden');
         }
 
-     async function loadLiveSolarCircleData() {
+    async function loadLiveSolarCircleData() {
     const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
     const tableBody = document.getElementById("leaderboardBody");
     const summarySection = document.getElementById("metricsSummary");
     const dashboardSection = document.getElementById("dashboardSection");
+    
+    // We can define a hardcoded fallback for now, or fetch a list of active areas if your API supports it
+    const fallbackPostcode = "SS9"; 
 
-    // Reset UI state
-    tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-gray-500'>Fetching live data for " + targetPostcode + "...</td></tr>";
+    tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-500'>Searching for ${targetPostcode}...</td></tr>`;
     summarySection.classList.add("hidden");
     dashboardSection.classList.add("hidden");
 
@@ -193,19 +195,25 @@
         
         if (data.status === "success" && data.results && data.results.length > 0) {
             globalPostcodeData = data.results;
-            
-            // Now show the sections since we have data
             summarySection.classList.remove("hidden");
             dashboardSection.classList.remove("hidden");
-            
             updateSummaryCards(targetPostcode);
         } else {
-            // Update table to show the "No arrays found" message
-            tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-400'>No active arrays found for <b>${targetPostcode}</b>. Be the first to join!</td></tr>`;
+            // No data found for the user's input
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan='8' class='text-center py-10 text-gray-400'>
+                        <p class="text-lg font-bold mb-2">Sorry, no data available for <b>${targetPostcode}</b>.</p>
+                        <p class="text-sm mb-4">Would you like to see data for a nearby area like <b>${fallbackPostcode}</b> instead?</p>
+                        <button onclick="document.getElementById('postcodeInput').value='${fallbackPostcode}'; loadLiveSolarCircleData();" 
+                                class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded">
+                            View ${fallbackPostcode} Data
+                        </button>
+                    </td>
+                </tr>`;
         }
     } catch (error) {
-        console.error("Failed to fetch:", error);
-        tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-red-400'>Could not connect to the server. Please try again later.</td></tr>";
+        tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-red-400'>Connection error. Please try again.</td></tr>";
     }
 }
 
