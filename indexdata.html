@@ -11,18 +11,86 @@
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
+
+    <div id="infoModal" onclick="closeModal()" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl max-w-md w-full p-6 shadow-2xl relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold">&times;</button>
+            <h3 id="modalTitle" class="text-lg font-black text-white mb-2 uppercase tracking-tight"></h3>
+            <p id="modalBody" class="text-sm text-gray-300 leading-relaxed"></p>
+        </div>
+    </div>
+
     <header class="border-b border-gray-800 bg-gray-900 sticky top-0 z-50">
-        </header>
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex flex-col">
+                <span class="text-xl font-black tracking-tight bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">SOLAR CIRCLE</span>
+                <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mt-0.5">Real Data. Shared Simply.</span>
+            </div>
+            <div>
+                <a href="register.html" class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold px-4 py-2 rounded-md text-xs uppercase tracking-wide transition-colors">Join the Circle ☀️</a>
+            </div>
+        </div>
+    </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
-        </main>
+        <section class="mb-12 text-center max-w-2xl mx-auto">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">See What Solar Generates In Your Area</h1>
+            <p class="text-gray-400 mb-6 text-sm sm:text-base">No estimated sales pitches or corporate calculations. Review live solar generation data crowdsourced directly from homes nearby.</p>
+            
+            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-xl text-left max-w-md mx-auto">
+                <label for="postcodeInput" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Enter Outward Postcode</label>
+                <div class="flex gap-2">
+                    <div class="relative w-full">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 font-mono text-sm">📍</span>
+                        <input type="text" id="postcodeInput" value="SS7" maxlength="4" placeholder="e.g. SS7, CM1" class="w-full bg-gray-900 text-white pl-9 pr-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 border border-transparent font-black tracking-widest uppercase text-base">
+                    </div>
+                    <button onclick="searchPostcode()" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 font-black px-5 py-3 rounded-lg transition-all duration-200 shadow-md whitespace-nowrap text-sm uppercase tracking-wide">Search</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="metricsSummary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Active Tracked Arrays</p>
+                <h3 id="activeSystemsCount" class="text-2xl font-black text-white">-</h3>
+            </div>
+            <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 border-l-4 border-l-yellow-500">
+                <p class="text-xs font-semibold uppercase tracking-wider text-yellow-400 mb-1">Average Efficiency Score</p>
+                <h3 id="areaAverageYield" class="text-2xl font-black text-white">-</h3>
+            </div>
+            <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Total Generation Today</p>
+                <h3 id="areaTotalGen" class="text-2xl font-black text-white">- <span class="text-xs font-normal text-gray-400">kWh</span></h3>
+            </div>
+        </section>
+
+        <section id="dashboardSection" class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-xl hidden">
+            <div class="p-6 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white">📊 <span id="currentPostcodeTag" class="text-yellow-400 uppercase font-mono"></span> Standings</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-900/50 text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-700">
+                            <th class="py-4 px-6 text-center">Rank</th>
+                            <th class="py-4 px-4">User</th>
+                            <th class="py-4 px-4 text-right">Live Output</th>
+                            <th class="py-4 px-4 text-right">Generated Today</th>
+                            <th class="py-4 px-4 text-right">ES</th>
+                            <th class="py-4 px-4 text-right">SES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody" class="divide-y divide-gray-700/50 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
     <script>
         let currentSortField = 'es'; 
         let currentSortDirection = 'desc';
         let globalPostcodeData = [];
 
-        // Your Config
         const userConfig = JSON.parse(localStorage.getItem('solarCircleProfile')) || {
             username: "EcoHome-Benfleet",
             capacity: 10.56,
@@ -38,11 +106,11 @@
             }
         };
 
-        // INTEGRATED FETCH LOGIC
         async function loadLiveSolarCircleData() {
             const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
             
             try {
+                // Fetch from your live backend
                 const url = `https://solar-circle-backend-production.up.railway.app/api/live_stats?capacity=${userConfig.capacity}`;
                 const response = await fetch(url);
                 const liveData = await response.json();
@@ -56,17 +124,59 @@
                         userRow.generation = liveData.metrics.e_today;
                         userRow.es = liveData.metrics.es;
                         userRow.ses = liveData.metrics.ses;
+                        userRow.size = liveData.metrics.system_size;
                     }
                 }
             } catch (error) {
-                console.warn("API Offline, using cache");
+                console.warn("Telemetry link offline. Using local cache.");
             }
             updateSummaryCards(targetPostcode);
         }
 
-        // Keep your renderTable, setSort, and updateSummaryCards functions exactly as they were!
-        // ... (rest of your existing script functions)
-        
+        function updateSummaryCards(postcode) {
+            globalPostcodeData = solarCircleDatabase[postcode]["2026-05-21"];
+            const totalArraysCount = globalPostcodeData.length;
+            const totalGeneration = globalPostcodeData.reduce((sum, entry) => sum + entry.generation, 0);
+            const totalEs = globalPostcodeData.reduce((sum, entry) => sum + entry.es, 0);
+            const avgEs = totalArraysCount > 0 ? (totalEs / totalArraysCount) : 0;
+
+            document.getElementById("activeSystemsCount").innerText = totalArraysCount;
+            document.getElementById("areaAverageYield").innerHTML = `${avgEs.toFixed(2)} <span class="text-xs font-normal text-gray-400">avg ES</span>`;
+            document.getElementById("areaTotalGen").innerHTML = `${totalGeneration.toFixed(1)} <span class="text-xs font-normal text-gray-400">kWh</span>`;
+
+            document.getElementById("dashboardSection").classList.remove("hidden");
+            document.getElementById("currentPostcodeTag").innerText = postcode;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById("leaderboardBody");
+            tableBody.innerHTML = "";
+            globalPostcodeData.forEach((row, index) => {
+                const tr = document.createElement("tr");
+                tr.className = row.id.includes("(You)") ? "bg-yellow-500/10" : "";
+                tr.innerHTML = `
+                    <td class="py-5 px-6 text-center font-bold text-gray-400">${index + 1}</td>
+                    <td class="py-5 px-4 font-bold text-white">${row.id}</td>
+                    <td class="py-5 px-4 text-right font-mono">${row.baseLiveKw.toFixed(3)} kW</td>
+                    <td class="py-5 px-4 text-right font-mono">${row.generation.toFixed(1)} kWh</td>
+                    <td class="py-5 px-4 text-right font-mono text-yellow-400 font-bold">${row.es.toFixed(2)}</td>
+                    <td class="py-5 px-4 text-right font-mono text-orange-400 font-bold">${row.ses.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function searchPostcode() {
+            const input = document.getElementById("postcodeInput").value.trim().toUpperCase();
+            if (solarCircleDatabase[input]) {
+                loadLiveSolarCircleData();
+            } else {
+                alert("No data for this postcode yet.");
+            }
+        }
+
+        function closeModal() { document.getElementById('infoModal').classList.add('hidden'); }
         window.onload = function() { loadLiveSolarCircleData(); };
     </script>
 </body>
