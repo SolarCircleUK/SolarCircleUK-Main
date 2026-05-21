@@ -220,9 +220,11 @@
         }
 
         function renderTable() {
+    const tableBody = document.getElementById("leaderboardBody");
+    
+    // Safety check: if there is no data at all, do nothing (the loading message or 'not found' message is already handled)
     if (!globalPostcodeData || globalPostcodeData.length === 0) return;
 
-    const tableBody = document.getElementById("leaderboardBody");
     const orientationFilter = document.getElementById("filterOrientation").value;
     const scaleFilter = document.getElementById("filterScale").value;
 
@@ -233,14 +235,20 @@
         return matchesOrientation && matchesScale;
     });
 
-    // 2. Sort the data
+    // 2. Handle "No results for this filter" state
+    if (filteredData.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-400 italic'>No systems match those specific filters. Try changing your search criteria.</td></tr>`;
+        return;
+    }
+
+    // 3. Sort the data
     filteredData.sort((a, b) => {
         let valA = a[currentSortField];
         let valB = b[currentSortField];
         return currentSortDirection === 'desc' ? valB - valA : valA - valB;
     });
 
-    // 3. Render rows
+    // 4. Render rows
     tableBody.innerHTML = filteredData.map((row, index) => `
         <tr class="hover:bg-gray-800/50 transition-colors">
             <td class="py-4 px-6 text-center font-bold text-gray-500">#${index + 1}</td>
