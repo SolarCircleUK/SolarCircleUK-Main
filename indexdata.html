@@ -220,7 +220,7 @@
         }
 
         function renderTable() {
-            // (Paste your existing renderTable function logic here)
+            if (!globalPostcodeData || globalPostcodeData.length === 0) return;
         }
 
         window.onload = function() { 
