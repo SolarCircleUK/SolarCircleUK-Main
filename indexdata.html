@@ -220,8 +220,40 @@
         }
 
         function renderTable() {
-            if (!globalPostcodeData || globalPostcodeData.length === 0) return;
-        }
+    if (!globalPostcodeData || globalPostcodeData.length === 0) return;
+
+    const tableBody = document.getElementById("leaderboardBody");
+    const orientationFilter = document.getElementById("filterOrientation").value;
+    const scaleFilter = document.getElementById("filterScale").value;
+
+    // 1. Filter the data
+    let filteredData = globalPostcodeData.filter(item => {
+        const matchesOrientation = orientationFilter === "ALL" || item.orientation === orientationFilter;
+        const matchesScale = scaleFilter === "ALL" || item.scale === scaleFilter;
+        return matchesOrientation && matchesScale;
+    });
+
+    // 2. Sort the data
+    filteredData.sort((a, b) => {
+        let valA = a[currentSortField];
+        let valB = b[currentSortField];
+        return currentSortDirection === 'desc' ? valB - valA : valA - valB;
+    });
+
+    // 3. Render rows
+    tableBody.innerHTML = filteredData.map((row, index) => `
+        <tr class="hover:bg-gray-800/50 transition-colors">
+            <td class="py-4 px-6 text-center font-bold text-gray-500">#${index + 1}</td>
+            <td class="py-4 px-4 font-semibold text-white">${row.username}</td>
+            <td class="py-4 px-4 text-gray-400">${row.layout || 'N/A'}</td>
+            <td class="py-4 px-4 text-right font-mono">${row.size} kWp</td>
+            <td class="py-4 px-4 text-right font-black text-emerald-400">${row.live} kW</td>
+            <td class="py-4 px-4 text-right font-mono">${row.generation} kWh</td>
+            <td class="py-4 px-4 text-right font-bold text-yellow-400">${row.es.toFixed(2)}</td>
+            <td class="py-4 px-6 text-right font-bold text-orange-400">${row.ses.toFixed(2)}</td>
+        </tr>
+    `).join('');
+}
 
         window.onload = function() { 
             loadLiveSolarCircleData(); 
