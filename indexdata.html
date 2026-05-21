@@ -64,7 +64,7 @@
             </div>
         </section>
 
-        <section id="dashboardSection" class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-xl hidden">
+        <section id="dashboardSection" class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-xl">
             <div class="p-6 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
                 <h2 class="text-xl font-bold text-white">📊 <span id="currentPostcodeTag" class="text-yellow-400 uppercase font-mono"></span> Standings</h2>
             </div>
@@ -91,60 +91,50 @@
         let currentSortDirection = 'desc';
         let globalPostcodeData = [];
 
-        const userConfig = JSON.parse(localStorage.getItem('solarCircleProfile')) || {
-            username: "EcoHome-Benfleet",
-            capacity: 10.56,
-            orientation: "east_west"
-        };
-
+        const userConfig = { username: "EcoHome-Benfleet", capacity: 10.56, orientation: "east_west" };
         const solarCircleDatabase = {
             "SS7": {
                 "2026-05-21": [
-                    { id: `${userConfig.username} (You)`, size: userConfig.capacity, dbKey: userConfig.orientation, orientation: "East / West Split", generation: 0, battery: true, baseLiveKw: 0, es: 0, ses: 0, connectedDays: 6, weather: "☀️", status: "green" },
-                    { id: "SunnySouth-SS7", size: 4.20, dbKey: "south", orientation: "South", generation: 18.4, battery: false, baseLiveKw: 1.220, es: 4.38, ses: 0.95, connectedDays: 105, weather: "", status: "green" }
+                    { id: "EcoHome-Benfleet (You)", size: 10.56, dbKey: "east_west", generation: 0, battery: true, baseLiveKw: 0, es: 0, ses: 0 },
+                    { id: "SunnySouth-SS7", size: 4.20, dbKey: "south", generation: 18.4, battery: false, baseLiveKw: 1.220, es: 4.38, ses: 0.95 }
                 ]
             }
         };
 
         async function loadLiveSolarCircleData() {
-            const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
-            
+            console.log("Fetching live data...");
             try {
-                // Fetch from your live backend
-                const url = `https://solar-circle-backend-production.up.railway.app/api/live_stats?capacity=${userConfig.capacity}`;
+                // IMPORTANT: Replace this URL with your actual deployed Railway URL
+                const url = `https://solar-circle-backend-production.up.railway.app/api/live_stats?capacity=10.56`;
                 const response = await fetch(url);
                 const liveData = await response.json();
                 
-                if (liveData.status === "success" && solarCircleDatabase[targetPostcode]) {
-                    const dataset = solarCircleDatabase[targetPostcode]["2026-05-21"];
-                    const userRow = dataset.find(user => user.id.includes("(You)"));
-                    
+                console.log("Data received:", liveData);
+
+                if (liveData.status === "success") {
+                    const userRow = solarCircleDatabase["SS7"]["2026-05-21"].find(u => u.id.includes("(You)"));
                     if (userRow) {
                         userRow.baseLiveKw = liveData.metrics.pac;
                         userRow.generation = liveData.metrics.e_today;
                         userRow.es = liveData.metrics.es;
                         userRow.ses = liveData.metrics.ses;
-                        userRow.size = liveData.metrics.system_size;
                     }
                 }
             } catch (error) {
-                console.warn("Telemetry link offline. Using local cache.");
+                console.error("Fetch failed:", error);
             }
-            updateSummaryCards(targetPostcode);
+            updateSummaryCards("SS7");
         }
 
         function updateSummaryCards(postcode) {
             globalPostcodeData = solarCircleDatabase[postcode]["2026-05-21"];
-            const totalArraysCount = globalPostcodeData.length;
-            const totalGeneration = globalPostcodeData.reduce((sum, entry) => sum + entry.generation, 0);
-            const totalEs = globalPostcodeData.reduce((sum, entry) => sum + entry.es, 0);
-            const avgEs = totalArraysCount > 0 ? (totalEs / totalArraysCount) : 0;
+            const totalGen = globalPostcodeData.reduce((sum, entry) => sum + entry.generation, 0);
+            const avgEs = globalPostcodeData.reduce((sum, entry) => sum + entry.es, 0) / globalPostcodeData.length;
 
-            document.getElementById("activeSystemsCount").innerText = totalArraysCount;
-            document.getElementById("areaAverageYield").innerHTML = `${avgEs.toFixed(2)} <span class="text-xs font-normal text-gray-400">avg ES</span>`;
-            document.getElementById("areaTotalGen").innerHTML = `${totalGeneration.toFixed(1)} <span class="text-xs font-normal text-gray-400">kWh</span>`;
-
-            document.getElementById("dashboardSection").classList.remove("hidden");
+            document.getElementById("activeSystemsCount").innerText = globalPostcodeData.length;
+            document.getElementById("areaAverageYield").innerHTML = `${avgEs.toFixed(2)} <span class="text-xs text-gray-400">avg ES</span>`;
+            document.getElementById("areaTotalGen").innerHTML = `${totalGen.toFixed(1)} <span class="text-xs text-gray-400">kWh</span>`;
+            
             document.getElementById("currentPostcodeTag").innerText = postcode;
             renderTable();
         }
@@ -167,17 +157,10 @@
             });
         }
 
-        function searchPostcode() {
-            const input = document.getElementById("postcodeInput").value.trim().toUpperCase();
-            if (solarCircleDatabase[input]) {
-                loadLiveSolarCircleData();
-            } else {
-                alert("No data for this postcode yet.");
-            }
-        }
-
+        function searchPostcode() { loadLiveSolarCircleData(); }
         function closeModal() { document.getElementById('infoModal').classList.add('hidden'); }
-        window.onload = function() { loadLiveSolarCircleData(); };
+        
+        window.onload = loadLiveSolarCircleData;
     </script>
 </body>
 </html>
