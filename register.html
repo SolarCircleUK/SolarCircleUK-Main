@@ -262,13 +262,43 @@
         // ... (rest of your step navigation logic)
     }
 
-    async function handleFormSubmit(event) {
-        event.preventDefault();
-        const payload = {
-            username: document.getElementById('username').value.trim(),
-            postcode: document.getElementById('postcode').value.trim().toUpperCase(),
-            // ... (rest of your payload mapping)
-        };
+   async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    // Collect all inputs from the form
+    const payload = {
+        username: document.getElementById('username').value.trim(),
+        postcode: document.getElementById('postcode').value.trim().toUpperCase(),
+        capacity: document.getElementById('capacity').value,
+        hasBattery: document.getElementById('hasBattery').value,
+        batterySize: document.getElementById('batterySize').value,
+        orientation: document.getElementById('orientation').value,
+        shading: document.getElementById('shading').value,
+        inverterBrand: document.getElementById('inverterBrand').value,
+        apiKeyId: document.getElementById('apiKeyId').value,
+        apiSecret: document.getElementById('apiSecret').value,
+        inverterSerial: document.getElementById('inverterSerial').value
+    };
+
+    try {
+        const response = await fetch('/api/register_user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("System linked successfully!");
+            window.location.href = "index.html";
+        } else {
+            alert(`Sync Rejected: ${result.message}`);
+        }
+    } catch (err) {
+        alert("Connection error. Ensure the backend is running.");
+    }
+}
 
         try {
             // Note: Since this is all one app, you can use the relative path: '/api/register_user'
