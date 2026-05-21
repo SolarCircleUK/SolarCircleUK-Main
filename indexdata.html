@@ -156,7 +156,7 @@
         const solarCircleDatabase = {
             "SS7": {
                 "2026-05-21": [
-                    { id: `${userConfig.username} (You)`, size: userConfig.capacity || 10.56, dbKey: userConfig.orientation || "east_west", orientation: "East / West Split", generation: 38.2, battery: true, baseLiveKw: 2.140, es: 3.62, ses: 0.88, connectedDays: 6, weather: "☀️", status: "green" },
+                    { id: `${userConfig.username} (You)`, size: userConfig.capacity || 10.56, dbKey: userConfig.orientation || "east_west", orientation: "East / West Split", generation: 0, battery: true, baseLiveKw: 0, es: 0, ses: 0, connectedDays: 6, weather: "☀️", status: "green" },
                     { id: "SunnySouth-SS7", size: 4.20, dbKey: "south", orientation: "South", generation: 18.4, battery: false, baseLiveKw: 1.220, es: 4.38, ses: 0.95, connectedDays: 105, weather: "", status: "green" },
                     { id: "EssexArray-Cloudy", size: 7.80, dbKey: "east_west", orientation: "East / West Split", generation: 21.1, battery: true, baseLiveKw: 0.000, es: 2.71, ses: 0.81, connectedDays: 240, weather: "", status: "red" }
                 ]
@@ -189,6 +189,7 @@
         async function loadLiveSolarCircleData() {
             const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
             try {
+                // Ensure this URL is the correct live URL from your Railway deployment
                 const url = `https://solar-circle-backend-production.up.railway.app/api/live_stats?capacity=${userConfig.capacity}&postcode=${targetPostcode.substring(0,2)}&orientation=${userConfig.orientation}&shading=${userConfig.shading}`;
                 const response = await fetch(url);
                 const liveData = await response.json();
