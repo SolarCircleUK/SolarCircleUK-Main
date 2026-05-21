@@ -51,7 +51,7 @@
             </div>
         </section>
 
-        <section id="metricsSummary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+       <section id="metricsSummary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 hidden">
             <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
                 <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Active Tracked Arrays</p>
                 <h3 id="activeSystemsCount" class="text-2xl font-black text-white">-</h3>
@@ -176,23 +176,31 @@
             document.getElementById('infoModal').classList.add('hidden');
         }
 
-      async function loadLiveSolarCircleData() {
-        const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
-        const tableBody = document.getElementById("leaderboardBody");
-    
-        // Show a loading state
+     async function loadLiveSolarCircleData() {
+    const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
+    const tableBody = document.getElementById("leaderboardBody");
+    const summarySection = document.getElementById("metricsSummary");
+    const dashboardSection = document.getElementById("dashboardSection");
+
+    // Reset UI state
     tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-gray-500'>Fetching live data for " + targetPostcode + "...</td></tr>";
+    summarySection.classList.add("hidden");
+    dashboardSection.classList.add("hidden");
 
     try {
         const response = await fetch(`https://solar-circle-backend-production.up.railway.app/api/leaderboard/${targetPostcode}`);
         const data = await response.json();
         
-        // Check for success AND if there is actually data in the results
         if (data.status === "success" && data.results && data.results.length > 0) {
             globalPostcodeData = data.results;
+            
+            // Now show the sections since we have data
+            summarySection.classList.remove("hidden");
+            dashboardSection.classList.remove("hidden");
+            
             updateSummaryCards(targetPostcode);
         } else {
-            // No data found? Update the table to say so
+            // Update table to show the "No arrays found" message
             tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-400'>No active arrays found for <b>${targetPostcode}</b>. Be the first to join!</td></tr>`;
         }
     } catch (error) {
