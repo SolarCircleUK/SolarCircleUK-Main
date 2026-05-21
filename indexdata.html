@@ -152,17 +152,7 @@
             shading: "light",
             hasBattery: true
         };
-
-        const solarCircleDatabase = {
-            "SS7": {
-                "2026-05-21": [
-                    { id: `${userConfig.username} (You)`, size: userConfig.capacity || 10.56, dbKey: userConfig.orientation || "east_west", orientation: "East / West Split", generation: 0, battery: true, baseLiveKw: 0, es: 0, ses: 0, connectedDays: 6, weather: "☀️", status: "green" },
-                    { id: "SunnySouth-SS7", size: 4.20, dbKey: "south", orientation: "South", generation: 18.4, battery: false, baseLiveKw: 1.220, es: 4.38, ses: 0.95, connectedDays: 105, weather: "", status: "green" },
-                    { id: "EssexArray-Cloudy", size: 7.80, dbKey: "east_west", orientation: "East / West Split", generation: 21.1, battery: true, baseLiveKw: 0.000, es: 2.71, ses: 0.81, connectedDays: 240, weather: "", status: "red" }
-                ]
-            }
-        };
-
+        
         const explanations = {
             yield: "The Average Efficiency Score evaluates performance by dividing total generated energy (kWh) against system capacity (kWp). This normalises arrays of completely different structural shapes so they can be accurately contrasted directly context-by-context.",
             es: "The Efficiency Score (ES) shows who is getting the absolute most out of their system right now. It strips away size advantages—so a tiny 2kWp roof system can compete fairly with a massive 12kWp system. The higher the score, the harder the panels are working.",
@@ -210,16 +200,10 @@
     }
 }
         function searchPostcode() {
-            const inputPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
-            if (!solarCircleDatabase[inputPostcode]) {
-                alert(`No active arrays in "${inputPostcode}". Try searching SS7!`);
-                return;
-            }
             loadLiveSolarCircleData();
         }
 
         function updateSummaryCards(postcode) {
-            globalPostcodeData = solarCircleDatabase[postcode]["2026-05-21"];
             const totalArraysCount = globalPostcodeData.length;
             const totalGeneration = globalPostcodeData.reduce((sum, entry) => sum + entry.generation, 0);
             const totalEs = globalPostcodeData.reduce((sum, entry) => sum + entry.es, 0);
