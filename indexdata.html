@@ -187,33 +187,27 @@
         }
 
         async function loadLiveSolarCircleData() {
-            const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
-            try {
-                // Ensure this URL is the correct live URL from your Railway deployment
-                const url = `https://solar-circle-backend-production.up.railway.app/api/live_stats?capacity=${userConfig.capacity}&postcode=${targetPostcode.substring(0,2)}&orientation=${userConfig.orientation}&shading=${userConfig.shading}`;
-                const response = await fetch(url);
-                const liveData = await response.json();
-                
-                if (liveData.status === "success" && solarCircleDatabase[targetPostcode]) {
-                    const dataset = solarCircleDatabase[targetPostcode]["2026-05-21"];
-                    const userRow = dataset.find(user => user.id.includes("(You)"));
-                    
-                    if (userRow) {
-                        userRow.baseLiveKw = liveData.metrics.pac;
-                        userRow.generation = liveData.metrics.e_today;
-                        userRow.size = liveData.metrics.system_size; 
-                        userRow.es = liveData.metrics.es;
-                        userRow.ses = liveData.metrics.ses;
-                        userRow.weather = liveData.metrics.weather || "☀️";
-                        userRow.status = liveData.metrics.status || "green";
-                    }
-                }
-            } catch (error) {
-                console.warn("⚠️ Telemetry link offline. Using cached dataset structure.");
-            }
-            updateSummaryCards(targetPostcode);
-        }
+    const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
+    
+    // Show a loading state or just clear existing data
+    document.getElementById("leaderboardBody").innerHTML = "<tr><td colspan='8' class='text-center py-10'>Fetching live data...</td></tr>";
 
+    try {
+        // We are calling a new endpoint we will create in app.py
+        const response = await fetch(`https://YOUR-RAILWAY-URL.up.railway.app/api/leaderboard/${targetPostcode}`);
+        const data = await response.json();
+        
+        if (data.status === "success") {
+            globalPostcodeData = data.results; // Assign the list of users to your global variable
+            updateSummaryCards(targetPostcode);
+        } else {
+            alert("No active arrays found for this postcode.");
+        }
+    } catch (error) {
+        console.error("Failed to fetch:", error);
+        alert("Could not connect to the server.");
+    }
+}
         function searchPostcode() {
             const inputPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
             if (!solarCircleDatabase[inputPostcode]) {
