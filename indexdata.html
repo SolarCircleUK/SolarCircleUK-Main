@@ -176,32 +176,30 @@
             document.getElementById('infoModal').classList.add('hidden');
         }
 
-        async function loadLiveSolarCircleData() {
-    const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
+      async function loadLiveSolarCircleData() {
+        const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
+        const tableBody = document.getElementById("leaderboardBody");
     
-    // Show a loading state or just clear existing data
-    document.getElementById("leaderboardBody").innerHTML = "<tr><td colspan='8' class='text-center py-10'>Fetching live data...</td></tr>";
+        // Show a loading state
+    tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-gray-500'>Fetching live data for " + targetPostcode + "...</td></tr>";
 
     try {
-        // We are calling a new endpoint we will create in app.py
-        
         const response = await fetch(`https://solar-circle-backend-production.up.railway.app/api/leaderboard/${targetPostcode}`);
         const data = await response.json();
         
-        if (data.status === "success") {
-            globalPostcodeData = data.results; // Assign the list of users to your global variable
+        // Check for success AND if there is actually data in the results
+        if (data.status === "success" && data.results && data.results.length > 0) {
+            globalPostcodeData = data.results;
             updateSummaryCards(targetPostcode);
         } else {
-            alert("No active arrays found for this postcode.");
+            // No data found? Update the table to say so
+            tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-400'>No active arrays found for <b>${targetPostcode}</b>. Be the first to join!</td></tr>`;
         }
     } catch (error) {
         console.error("Failed to fetch:", error);
-        alert("Could not connect to the server.");
+        tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-red-400'>Could not connect to the server. Please try again later.</td></tr>";
     }
 }
-        function searchPostcode() {
-            loadLiveSolarCircleData();
-        }
 
         function updateSummaryCards(postcode) {
             const totalArraysCount = globalPostcodeData.length;
