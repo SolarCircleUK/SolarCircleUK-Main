@@ -141,9 +141,15 @@
     </main>
 
     <script>
+        // Global variables declared ONCE
         let currentSortField = 'es'; 
         let currentSortDirection = 'desc';
         let globalPostcodeData = [];
+        let validOutwardPostcodes = []; 
+
+        const structuralPostcodePool = [
+            "SS7", "SS9", "CM1", "RM11", "CB1", "CO1", "IG1", "E17", "ME14", "TN1"
+        ];
 
         const explanations = {
             yield: "The Average Efficiency Score evaluates performance by dividing total generated energy (kWh) against system capacity (kWp).",
@@ -162,52 +168,62 @@
             document.getElementById('infoModal').classList.add('hidden');
         }
 
-       async function loadLiveSolarCircleData() {
-    const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
-    
-    // GUARD: If they click search but haven't typed anything, do nothing
-    if (!targetPostcode) return; 
-
-    const tableBody = document.getElementById("leaderboardBody");
-    const summarySection = document.getElementById("metricsSummary");
-    const dashboardSection = document.getElementById("dashboardSection");
-
-    // 1. Show the loading state inside the table
-    tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-500'>Searching for ${targetPostcode}...</td></tr>`;
-    summarySection.classList.add("hidden");
-    dashboardSection.classList.add("hidden");
-
-    try {
-        // 2. Query the live Railway API
-        const response = await fetch(`https://solar-circle-backend-production.up.railway.app/api/leaderboard/${targetPostcode}`);
-        const data = await response.json();
-        
-        if (data.status === "success" && data.results && data.results.length > 0) {
-            globalPostcodeData = data.results;
-            summarySection.classList.remove("hidden");
-            dashboardSection.classList.remove("hidden");
-            updateSummaryCards(targetPostcode);
-        } else {
-            // 3. Reveal the dashboard so the custom empty state is visible
-            dashboardSection.classList.remove("hidden");
+        async function loadLiveSolarCircleData() {
+            const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
             
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan='8' class='text-center py-10 text-gray-400'>
-                        <p class="text-xl font-black text-white mb-2">No active arrays found in <b>${targetPostcode}</b> yet.</p>
-                        <p class="text-sm mb-6 max-w-sm mx-auto">Be the first to put your area on the map! Join the Solar Circle and start sharing your generation data today.</p>
-                        <a href="register.html" class="inline-block bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-black px-6 py-3 rounded-lg shadow-lg transition-all">
-                            Join the Circle ☀️
-                        </a>
-                    </td>
-                </tr>`;
+            // GUARD 1: If they click search but haven't typed anything, just exit
+            if (!targetPostcode) return; 
+
+            const tableBody = document.getElementById("leaderboardBody");
+            const summarySection = document.getElementById("metricsSummary");
+            const dashboardSection = document.getElementById("dashboardSection");
+
+            // GUARD 2: If we have loaded the registry, check if the typed postcode is actually a real UK layout
+            if (validOutwardPostcodes.length > 0 && !validOutwardPostcodes.includes(targetPostcode)) {
+                summarySection.classList.add("hidden");
+                dashboardSection.classList.remove("hidden");
+                
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan='8' class='text-center py-10 text-gray-400'>
+                            <p class="text-xl font-black text-red-400 mb-2">Invalid Postcode Structure</p>
+                            <p class="text-sm max-w-sm mx-auto"><b>${targetPostcode}</b> is not recognized as a valid UK outward postcode. Please check your spelling and try again.</p>
+                        </td>
+                    </tr>`;
+                return; 
+            }
+
+            tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-500'>Searching for ${targetPostcode}...</td></tr>`;
+            summarySection.classList.add("hidden");
+            dashboardSection.classList.add("hidden");
+
+            try {
+                const response = await fetch(`https://solar-circle-backend-production.up.railway.app/api/leaderboard/${targetPostcode}`);
+                const data = await response.json();
+                
+                if (data.status === "success" && data.results && data.results.length > 0) {
+                    globalPostcodeData = data.results;
+                    summarySection.classList.remove("hidden");
+                    dashboardSection.classList.remove("hidden");
+                    updateSummaryCards(targetPostcode);
+                } else {
+                    dashboardSection.classList.remove("hidden");
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan='8' class='text-center py-10 text-gray-400'>
+                                <p class="text-xl font-black text-white mb-2">No active arrays found in <b>${targetPostcode}</b> yet.</p>
+                                <p class="text-sm mb-6 max-w-sm mx-auto">Be the first to put your area on the map! Join the Solar Circle and start sharing your generation data today.</p>
+                                <a href="register.html" class="inline-block bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-black px-6 py-3 rounded-lg shadow-lg transition-all">
+                                    Join the Circle ☀️
+                                </a>
+                            </td>
+                        </tr>`;
+                }
+            } catch (error) {
+                dashboardSection.classList.remove("hidden");
+                tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-red-400'>Connection error. Please try again later.</td></tr>";
+            }
         }
-    } catch (error) {
-        // 4. Reveal the dashboard so the connection error is visible
-        dashboardSection.classList.remove("hidden");
-        tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-red-400'>Connection error. Please try again later.</td></tr>";
-    }
-}
 
         function updateSummaryCards(postcode) {
             const totalArraysCount = globalPostcodeData.length;
@@ -222,81 +238,75 @@
             renderTable();
         }
 
-        // --- Keep your existing renderTable and setSort functions here ---
         function setSort(field) {
             currentSortDirection = (currentSortField === field && currentSortDirection === 'desc') ? 'asc' : 'desc';
             currentSortField = field;
             renderTable();
         }
 
-       function renderTable() {
-    const tableBody = document.getElementById("leaderboardBody");
-    
-    // Safety check: if there is no data at all, do nothing (the loading message or 'not found' message is already handled)
-    if (!globalPostcodeData || globalPostcodeData.length === 0) return;
+        function renderTable() {
+            const tableBody = document.getElementById("leaderboardBody");
+            
+            if (!globalPostcodeData || globalPostcodeData.length === 0) return;
 
-    const orientationFilter = document.getElementById("filterOrientation").value;
-    const scaleFilter = document.getElementById("filterScale").value;
+            const orientationFilter = document.getElementById("filterOrientation").value;
+            const scaleFilter = document.getElementById("filterScale").value;
 
-    // 1. Filter the data
-    let filteredData = globalPostcodeData.filter(item => {
-        const matchesOrientation = orientationFilter === "ALL" || item.orientation === orientationFilter;
-        const matchesScale = scaleFilter === "ALL" || item.scale === scaleFilter;
-        return matchesOrientation && matchesScale;
-    });
+            let filteredData = globalPostcodeData.filter(item => {
+                const matchesOrientation = orientationFilter === "ALL" || item.orientation === orientationFilter;
+                const matchesScale = scaleFilter === "ALL" || item.scale === scaleFilter;
+                return matchesOrientation && matchesScale;
+            });
 
-    // 2. Handle "No results for this filter" state
-    if (filteredData.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-400 italic'>No systems match those specific filters. Try changing your search criteria.</td></tr>`;
-        return;
-    }
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan='8' class='text-center py-10 text-gray-400 italic'>No systems match those specific filters. Try changing your search criteria.</td></tr>`;
+                return;
+            }
 
-    // 3. Sort the data
-    filteredData.sort((a, b) => {
-        let valA = a[currentSortField];
-        let valB = b[currentSortField];
-        return currentSortDirection === 'desc' ? valB - valA : valA - valB;
-    });
+            filteredData.sort((a, b) => {
+                let valA = a[currentSortField];
+                let valB = b[currentSortField];
+                return currentSortDirection === 'desc' ? valB - valA : valA - valB;
+            });
 
-    // 4. Render rows
-    tableBody.innerHTML = filteredData.map((row, index) => `
-        <tr class="hover:bg-gray-800/50 transition-colors">
-            <td class="py-4 px-6 text-center font-bold text-gray-500">#${index + 1}</td>
-            <td class="py-4 px-4 font-semibold text-white">${row.username}</td>
-            <td class="py-4 px-4 text-gray-400">${row.layout || 'N/A'}</td>
-            <td class="py-4 px-4 text-right font-mono">${row.size} kWp</td>
-            <td class="py-4 px-4 text-right font-black text-emerald-400">${row.live} kW</td>
-            <td class="py-4 px-4 text-right font-mono">${row.generation} kWh</td>
-            <td class="py-4 px-4 text-right font-bold text-yellow-400">${row.es.toFixed(2)}</td>
-            <td class="py-4 px-6 text-right font-bold text-orange-400">${row.ses.toFixed(2)}</td>
-        </tr>
-    `).join('');
-}
-       // A pool of example postcodes to rotate through as placeholder suggestions
-const structuralPostcodePool = [
-    "SS7", "SS9", "CM1", "RM11", "CB1", "CO1", "IG1", "E17", "ME14", "TN1"
-];
-
-window.onload = function() { 
-    // 1. Pick a random postcode for the placeholder suggestion
-    const randomIndex = Math.floor(Math.random() * structuralPostcodePool.length);
-    const suggestedPostcode = structuralPostcodePool[randomIndex];
-    
-    // 2. Apply it cleanly to the input placeholder attribute
-    const inputElement = document.getElementById("postcodeInput");
-    inputElement.placeholder = `e.g. ${suggestedPostcode}`;
-    
-    // 3. Bind the search event button (But DO NOT call loadLiveSolarCircleData() here)
-    document.getElementById("searchBtn").addEventListener("click", loadLiveSolarCircleData);
-
-    // Optional: Allow the user to just press "Enter" inside the input box to trigger search
-    inputElement.addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            loadLiveSolarCircleData();
+            tableBody.innerHTML = filteredData.map((row, index) => `
+                <tr class="hover:bg-gray-800/50 transition-colors">
+                    <td class="py-4 px-6 text-center font-bold text-gray-500">#${index + 1}</td>
+                    <td class="py-4 px-4 font-semibold text-white">${row.username}</td>
+                    <td class="py-4 px-4 text-gray-400">${row.layout || 'N/A'}</td>
+                    <td class="py-4 px-4 text-right font-mono">${row.size} kWp</td>
+                    <td class="py-4 px-4 text-right font-black text-emerald-400">${row.live} kW</td>
+                    <td class="py-4 px-4 text-right font-mono">${row.generation} kWh</td>
+                    <td class="py-4 px-4 text-right font-bold text-yellow-400">${row.es.toFixed(2)}</td>
+                    <td class="py-4 px-6 text-right font-bold text-orange-400">${row.ses.toFixed(2)}</td>
+                </tr>
+            `).join('');
         }
-    });
-};
+
+        window.onload = async function() { 
+            // 1. Pick a random postcode suggestion for the placeholder
+            const randomIndex = Math.floor(Math.random() * structuralPostcodePool.length);
+            const suggestedPostcode = structuralPostcodePool[randomIndex];
+            const inputElement = document.getElementById("postcodeInput");
+            inputElement.placeholder = `e.g. ${suggestedPostcode}`;
+            
+            // 2. Bind UI listeners
+            document.getElementById("searchBtn").addEventListener("click", loadLiveSolarCircleData);
+            inputElement.addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    loadLiveSolarCircleData();
+                }
+            });
+
+            // 3. Pre-load your valid UK postcodes JSON file silently in the background
+            try {
+                const response = await fetch('postcodes.json'); 
+                validOutwardPostcodes = await response.json(); 
+            } catch (error) {
+                console.error("Failed to load local postcode validation registry:", error);
+            }
+        };
     </script>
 </body>
 </html>
