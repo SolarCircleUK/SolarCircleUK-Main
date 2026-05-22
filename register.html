@@ -69,6 +69,15 @@
                     </div>
                 </div>
 
+                <div class="pt-2 border-t border-gray-700">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-2">Optional Hardware Details</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="regPanelBrand" placeholder="Panel Brand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                        <input type="text" id="regPanelRating" placeholder="Panel Rating (W)" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                    </div>
+                    <input type="text" id="regBatteryBrand" placeholder="Battery Brand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm mt-2">
+                </div>
+
                 <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 font-black py-3 rounded-lg mt-4 uppercase text-xs tracking-widest hover:from-yellow-400 transition-all">Create Account ☀️</button>
             </form>
         </div>
@@ -91,6 +100,10 @@
             const hasBattery = document.getElementById('regHasBattery').value;
             const batteryInput = document.getElementById('regBatterySize');
             batteryInput.disabled = (hasBattery !== 'yes');
+            // Visual feedback
+            batteryInput.className = batteryInput.disabled 
+                ? "w-full bg-gray-900 text-gray-500 px-3 py-2 rounded-lg border border-gray-700 text-sm disabled:opacity-50"
+                : "w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm";
         }
 
         document.addEventListener('DOMContentLoaded', generateSolarUsername);
@@ -110,7 +123,10 @@
                         system_size_kwp: document.getElementById('regSize').value,
                         has_battery: document.getElementById('regHasBattery').value,
                         battery_size: document.getElementById('regBatterySize').value || 0,
-                        inverter_brand: document.getElementById('regInverterBrand').value
+                        inverter_brand: document.getElementById('regInverterBrand').value,
+                        panel_brand: document.getElementById('regPanelBrand').value,
+                        panel_rating: document.getElementById('regPanelRating').value,
+                        battery_brand: document.getElementById('regBatteryBrand').value
                     }}
                 });
                 if (error) throw error;
