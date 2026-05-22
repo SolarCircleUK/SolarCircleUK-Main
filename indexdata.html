@@ -141,7 +141,6 @@
     </main>
 
     <script>
-        // Global variables declared ONCE
         let currentSortField = 'es'; 
         let currentSortDirection = 'desc';
         let globalPostcodeData = [];
@@ -171,14 +170,12 @@
         async function loadLiveSolarCircleData() {
             const targetPostcode = document.getElementById("postcodeInput").value.trim().toUpperCase();
             
-            // GUARD 1: If they click search but haven't typed anything, just exit
             if (!targetPostcode) return; 
 
             const tableBody = document.getElementById("leaderboardBody");
             const summarySection = document.getElementById("metricsSummary");
             const dashboardSection = document.getElementById("dashboardSection");
 
-            // GUARD 2: If we have loaded the registry, check if the typed postcode is actually a real UK layout
             if (validOutwardPostcodes.length > 0 && !validOutwardPostcodes.includes(targetPostcode)) {
                 summarySection.classList.add("hidden");
                 dashboardSection.classList.remove("hidden");
@@ -227,8 +224,8 @@
 
         function updateSummaryCards(postcode) {
             const totalArraysCount = globalPostcodeData.length;
-            const totalGeneration = globalPostcodeData.reduce((sum, entry) => sum + entry.generation, 0);
-            const totalEs = globalPostcodeData.reduce((sum, entry) => sum + entry.es, 0);
+            const totalGeneration = globalPostcodeData.reduce((sum, entry) => sum + Number(entry.generation || 0), 0);
+            const totalEs = globalPostcodeData.reduce((sum, entry) => sum + Number(entry.es || 0), 0);
             const avgEs = totalArraysCount > 0 ? (totalEs / totalArraysCount) : 0;
 
             document.getElementById("activeSystemsCount").innerText = totalArraysCount;
@@ -264,8 +261,9 @@
             }
 
             filteredData.sort((a, b) => {
-                let valA = a[currentSortField];
-                let valB = b[currentSortField];
+                // Coerce fields safely to Floats to prevent string parsing sorting bugs
+                let valA = parseFloat(a[currentSortField]) || 0;
+                let valB = parseFloat(b[currentSortField]) || 0;
                 return currentSortDirection === 'desc' ? valB - valA : valA - valB;
             });
 
@@ -277,20 +275,18 @@
                     <td class="py-4 px-4 text-right font-mono">${row.size} kWp</td>
                     <td class="py-4 px-4 text-right font-black text-emerald-400">${row.live} kW</td>
                     <td class="py-4 px-4 text-right font-mono">${row.generation} kWh</td>
-                    <td class="py-4 px-4 text-right font-bold text-yellow-400">${row.es.toFixed(2)}</td>
-                    <td class="py-4 px-6 text-right font-bold text-orange-400">${row.ses.toFixed(2)}</td>
+                    <td class="py-4 px-4 text-right font-bold text-yellow-400">${Number(row.es).toFixed(2)}</td>
+                    <td class="py-4 px-6 text-right font-bold text-orange-400">${Number(row.ses).toFixed(2)}</td>
                 </tr>
             `).join('');
         }
 
         window.onload = async function() { 
-            // 1. Pick a random postcode suggestion for the placeholder
             const randomIndex = Math.floor(Math.random() * structuralPostcodePool.length);
             const suggestedPostcode = structuralPostcodePool[randomIndex];
             const inputElement = document.getElementById("postcodeInput");
             inputElement.placeholder = `e.g. ${suggestedPostcode}`;
             
-            // 2. Bind UI listeners
             document.getElementById("searchBtn").addEventListener("click", loadLiveSolarCircleData);
             inputElement.addEventListener("keypress", function(event) {
                 if (event.key === "Enter") {
@@ -299,9 +295,9 @@
                 }
             });
 
-            // 3. Pre-load your valid UK postcodes JSON file silently in the background
+            // FIXED: Point to your backend route rather than a static loose file name
             try {
-                const response = await fetch('postcodes.json'); 
+                const response = await fetch('https://solar-circle-backend-production.up.railway.app/api/valid-postcodes'); 
                 validOutwardPostcodes = await response.json(); 
             } catch (error) {
                 console.error("Failed to load local postcode validation registry:", error);
