@@ -8,40 +8,65 @@
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col justify-between">
 
+    <header class="border-b border-gray-800 bg-gray-900 px-4 py-4">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex flex-col">
+               <a href="indexdata.html" class="flex flex-col group transition-opacity hover:opacity-90">
+                    <span class="text-xl font-black tracking-tight bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">SOLAR CIRCLE</span>
+                    <span class="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-amber-400 font-bold mt-0.5 transition-colors">Real Data. Shared Simply.</span>
+                </a>
+            </div>
+            <a href="indexdata.html" class="text-xs font-bold text-gray-400 hover:text-white transition-colors">&larr; Exit to Dashboard</a>
+        </div>
+    </header>
+
     <main class="max-w-md mx-auto px-4 py-12">
         <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-2xl">
-            <h2 class="text-2xl font-black text-white mb-6 text-center">JOIN THE CIRCLE</h2>
-            
+            <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight text-center">Join the Circle</h2>
             <form id="registrationForm" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Leaderboard Username</label>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email</label>
+                    <input type="email" id="regEmail" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Password</label>
+                    <input type="password" id="regPassword" required minlength="6" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+                </div>
+                <hr class="border-gray-700 my-4" />
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Leaderboard Username</label>
                     <input type="text" id="regUsername" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
                 </div>
-                <button type="submit" class="w-full bg-yellow-500 py-3 rounded-lg font-black text-gray-900">Create Account</button>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Postcode</label>
+                        <input type="text" id="regPostcode" required maxlength="4" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Size (kWp)</label>
+                        <input type="number" id="regSize" required step="0.01" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+                    </div>
+                </div>
+                <div id="formMsg" class="hidden text-xs font-bold p-3 rounded-lg text-center"></div>
+                <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 font-black py-3 rounded-lg">Create Account ☀️</button>
             </form>
-            <div id="formMsg" class="hidden mt-4 text-center text-xs font-bold"></div>
         </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Use a unique name for the client to avoid collisions
-        const supabaseUrl = 'https://czclwtgzgndvmmzkzvhw.supabase.co'; 
-        const supabaseAnonKey = 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j'; 
-        
-        // Check if global supabase is already defined before creating it
-        window.supabaseClient = window.supabaseClient || supabase.createClient(supabaseUrl, supabaseAnonKey);
+        // Using 'var' instead of 'const' fixes the "Identifier already declared" error
+        var supabaseUrl = 'https://czclwtgzgndvmmzkzvhw.supabase.co'; 
+        var supabaseAnonKey = 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j'; 
+        var supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
         function generateSolarUsername() {
-            const prefixes = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt"];
-            const suffixes = ["Ranger", "Chaser", "Core", "Nexus", "Pulse"];
-            const p = prefixes[Math.floor(Math.random() * prefixes.length)];
-            const s = suffixes[Math.floor(Math.random() * suffixes.length)];
+            const p = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt"][Math.floor(Math.random() * 6)];
+            const s = ["Ranger", "Chaser", "Core", "Nexus", "Pulse"][Math.floor(Math.random() * 5)];
             const field = document.getElementById('regUsername');
             if (field) field.value = `${p}${s}-${Math.floor(1000 + Math.random() * 9000)}`;
         }
 
-        // Run this once the DOM is ready
         document.addEventListener('DOMContentLoaded', generateSolarUsername);
     </script>
 </body>
