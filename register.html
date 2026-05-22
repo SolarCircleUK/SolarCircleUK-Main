@@ -10,17 +10,19 @@
 
     <header class="border-b border-gray-800 bg-gray-900 px-4 py-4">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <a href="indexdata.html" class="flex flex-col group transition-opacity hover:opacity-90">
-                <span class="text-xl font-black tracking-tight bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">SOLAR CIRCLE</span>
-                <span class="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-amber-400 font-bold mt-0.5 transition-colors">Real Data. Shared Simply.</span>
+             <a href="indexdata.html" class="flex flex-col group transition-opacity hover:opacity-90">
+                    <span class="text-xl font-black tracking-tight bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">SOLAR CIRCLE</span>
+                    <span class="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-amber-400 font-bold mt-0.5 transition-colors">Real Data. Shared Simply.</span>
             </a>
-            <a href="indexdata.html" class="text-xs font-bold text-gray-400 hover:text-white transition-colors">&larr; Exit</a>
+            <a href="indexdata.html" class="text-xs font-bold text-gray-400 hover:text-white transition-colors">&larr; Exit to Dashboard</a>
         </div>
     </header>
 
     <main class="flex-grow flex items-center justify-center px-4 py-8">
         <div class="w-full max-w-md bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-2xl">
             <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight text-center">Join the Circle</h2>
+            <p class="text-xs text-gray-400 text-center mb-6">Create your account to start tracking your generation data live.</p>
+
             <form id="registrationForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email</label>
@@ -30,7 +32,9 @@
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Password</label>
                     <input type="password" id="regPassword" required minlength="6" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
                 </div>
+
                 <hr class="border-gray-700 my-4" />
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Username</label>
@@ -41,7 +45,38 @@
                         <input type="number" id="regSize" required step="0.01" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 font-black py-3 rounded-lg mt-4 uppercase text-xs tracking-widest">Create Account ☀️</button>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Inverter Manufacturer</label>
+                    <select id="regInverterBrand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                        <option value="solis">Solis (Supported)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Battery?</label>
+                        <select id="regHasBattery" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Battery Size (kWh)</label>
+                        <input type="number" id="regBatterySize" placeholder="0.00" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-gray-700">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-2">Optional Hardware Details</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="regPanelBrand" placeholder="Panel Brand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                        <input type="text" id="regPanelRating" placeholder="Panel Rating (W)" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                    </div>
+                    <input type="text" id="regBatteryBrand" placeholder="Battery Brand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm mt-2">
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 font-black py-3 rounded-lg mt-4 uppercase text-xs tracking-widest hover:from-yellow-400 transition-all">Create Account ☀️</button>
             </form>
         </div>
     </main>
@@ -52,7 +87,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Username generator and auth setup same as before
         const supabaseUrl = 'https://czclwtgzgndvmmzkzvhw.supabase.co'; 
         const supabaseAnonKey = 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j'; 
         window.supabase = window.supabase || supabase.createClient(supabaseUrl, supabaseAnonKey);
@@ -60,9 +94,37 @@
         function generateSolarUsername() {
             const p = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt"][Math.floor(Math.random() * 6)];
             const s = ["Ranger", "Chaser", "Core", "Nexus", "Pulse"][Math.floor(Math.random() * 5)];
-            document.getElementById('regUsername').value = `${p}${s}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const field = document.getElementById('regUsername');
+            if (field) field.value = `${p}${s}-${Math.floor(1000 + Math.random() * 9000)}`;
         }
+
         document.addEventListener('DOMContentLoaded', generateSolarUsername);
+        
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Encrypting...";
+            
+            try {
+                const { error } = await window.supabase.auth.signUp({
+                    email: document.getElementById('regEmail').value,
+                    password: document.getElementById('regPassword').value,
+                    options: { data: { 
+                        username: document.getElementById('regUsername').value,
+                        system_size_kwp: document.getElementById('regSize').value,
+                        has_battery: document.getElementById('regHasBattery').value,
+                        battery_size: document.getElementById('regBatterySize').value,
+                        panel_brand: document.getElementById('regPanelBrand').value,
+                        panel_rating: document.getElementById('regPanelRating').value,
+                        battery_brand: document.getElementById('regBatteryBrand').value
+                    }}
+                });
+                if (error) throw error;
+                alert("Account created successfully!");
+                window.location.href = "indexdata.html";
+            } catch (err) { alert(err.message); submitBtn.disabled = false; submitBtn.innerText = "Create Account ☀️"; }
+        });
     </script>
 </body>
 </html>
