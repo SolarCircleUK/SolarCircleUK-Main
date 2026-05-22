@@ -140,6 +140,8 @@
         </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         let currentSortField = 'es'; 
         let currentSortDirection = 'desc';
@@ -153,7 +155,7 @@
         const explanations = {
             yield: "The Average Efficiency Score evaluates performance by dividing total generated energy (kWh) against system capacity (kWp).",
             es: "The Efficiency Score (ES) shows who is getting the absolute most out of their system right now.",
-            ses: "The Seasonal Efficiency Score (SES) evaluates long-term performance.",
+            ses: "The Seasonal Efficiency Score (SES) evaluates long-term performance over a rolling seasonal window.",
             maturity: "Data Maturity Milestone Pipeline..."
         };
 
@@ -251,7 +253,18 @@
 
             let filteredData = globalPostcodeData.filter(item => {
                 const matchesOrientation = orientationFilter === "ALL" || item.orientation === orientationFilter;
-                const matchesScale = scaleFilter === "ALL" || item.scale === scaleFilter;
+                
+                // Fallback computation for system scale categorization if backend drops explicit row.scale key
+                let systemScale = item.scale;
+                if (!systemScale && item.size) {
+                    const sysSize = parseFloat(item.size);
+                    if (sysSize < 2) systemScale = "XS";
+                    else if (sysSize >= 2 && sysSize < 5) systemScale = "SMALL";
+                    else if (sysSize >= 5 && sysSize < 8) systemScale = "MED";
+                    else if (sysSize >= 8) systemScale = "LARGE";
+                }
+
+                const matchesScale = scaleFilter === "ALL" || systemScale === scaleFilter;
                 return matchesOrientation && matchesScale;
             });
 
@@ -261,9 +274,13 @@
             }
 
             filteredData.sort((a, b) => {
-                // Coerce fields safely to Floats to prevent string parsing sorting bugs
-                let valA = parseFloat(a[currentSortField]) || 0;
-                let valB = parseFloat(b[currentSortField]) || 0;
+                // Safely sanitize custom text strings or preformatted metric values to avoid sorting crashes
+                let valA = typeof a[currentSortField] === 'string' ? parseFloat(a[currentSortField].replace(/[^\d.]/g, '')) : parseFloat(a[currentSortField]);
+                let valB = typeof b[currentSortField] === 'string' ? parseFloat(b[currentSortField].replace(/[^\d.]/g, '')) : parseFloat(b[currentSortField]);
+                
+                if (isNaN(valA)) valA = 0;
+                if (isNaN(valB)) valB = 0;
+                
                 return currentSortDirection === 'desc' ? valB - valA : valA - valB;
             });
 
@@ -271,10 +288,10 @@
                 <tr class="hover:bg-gray-800/50 transition-colors">
                     <td class="py-4 px-6 text-center font-bold text-gray-500">#${index + 1}</td>
                     <td class="py-4 px-4 font-semibold text-white">${row.username}</td>
-                    <td class="py-4 px-4 text-gray-400">${row.layout || 'N/A'}</td>
-                    <td class="py-4 px-4 text-right font-mono">${row.size} kWp</td>
-                    <td class="py-4 px-4 text-right font-black text-emerald-400">${row.live} kW</td>
-                    <td class="py-4 px-4 text-right font-mono">${row.generation} kWh</td>
+                    <td class="py-4 px-4 text-gray-400 capitalize">${(row.layout || row.orientation || 'N/A').replace('_', ' ')}</td>
+                    <td class="py-4 px-4 text-right font-mono">${parseFloat(row.size).toFixed(2)} kWp</td>
+                    <td class="py-4 px-4 text-right font-black text-emerald-400">${parseFloat(row.live).toFixed(2)} kW</td>
+                    <td class="py-4 px-4 text-right font-mono">${parseFloat(row.generation).toFixed(1)} kWh</td>
                     <td class="py-4 px-4 text-right font-bold text-yellow-400">${Number(row.es).toFixed(2)}</td>
                     <td class="py-4 px-6 text-right font-bold text-orange-400">${Number(row.ses).toFixed(2)}</td>
                 </tr>
@@ -295,7 +312,6 @@
                 }
             });
 
-            // FIXED: Point to your backend route rather than a static loose file name
             try {
                 const response = await fetch('https://solar-circle-backend-production.up.railway.app/api/valid-postcodes'); 
                 validOutwardPostcodes = await response.json(); 
