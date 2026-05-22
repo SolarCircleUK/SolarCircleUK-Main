@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,13 +20,11 @@
 
     <header class="border-b border-gray-800 bg-gray-900 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex flex-col">
-                <a href="indexdata.html" class="flex flex-col group transition-opacity hover:opacity-90">
-                    <span class="text-xl font-black tracking-tight bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">SOLAR CIRCLE</span>
-                    <span class="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-amber-400 font-bold mt-0.5 transition-colors">Real Data. Shared Simply.</span>
-                </a>
-            </div>
-            <div>
+            <a href="indexdata.html" class="flex flex-col group transition-opacity hover:opacity-90">
+                <span class="text-xl font-black tracking-tight bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">SOLAR CIRCLE</span>
+                <span class="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-amber-400 font-bold mt-0.5 transition-colors">Real Data. Shared Simply.</span>
+            </a>
+            <div id="authHeaderContainer">
                 <a href="register.html" class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold px-4 py-2 rounded-md text-xs uppercase tracking-wide transition-colors">Join the Circle ☀️</a>
             </div>
         </div>
@@ -145,6 +141,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
+
+        // Add this near the top of your script block
+const supabase = supabase.createClient('https://czclwtgzgndvmmzkzvhw.supabase.co', 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j');
+
+async function checkAuthState() {
+    const { data } = await supabase.auth.getSession();
+    const container = document.getElementById('authHeaderContainer');
+    
+    // If a session exists, swap the button
+    if (data.session) {
+        container.innerHTML = `<a href="dashboard.html" class="text-white hover:text-yellow-500 font-bold text-xs uppercase tracking-wide transition-colors">My Dashboard</a>`;
+    }
+}
         let currentSortField = 'es'; 
         let currentSortDirection = 'desc';
         let globalPostcodeData = [];
@@ -301,6 +310,7 @@
         }
 
         window.onload = async function() { 
+            checkAuthState(); 
             const randomIndex = Math.floor(Math.random() * structuralPostcodePool.length);
             const suggestedPostcode = structuralPostcodePool[randomIndex];
             const inputElement = document.getElementById("postcodeInput");
