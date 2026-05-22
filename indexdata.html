@@ -219,7 +219,7 @@
             renderTable();
         }
 
-        function renderTable() {
+       function renderTable() {
     const tableBody = document.getElementById("leaderboardBody");
     
     // Safety check: if there is no data at all, do nothing (the loading message or 'not found' message is already handled)
@@ -262,7 +262,6 @@
         </tr>
     `).join('');
 }
-
         window.onload = function() { 
             loadLiveSolarCircleData(); 
             document.getElementById("searchBtn").addEventListener("click", loadLiveSolarCircleData);
