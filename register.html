@@ -35,6 +35,8 @@
         <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 sm:p-8 shadow-2xl">
             <form id="multiStepForm" onsubmit="handleFormSubmit(event)">
                 
+                <div id="ui-alert" class="hidden border rounded-lg p-4 mb-6 text-sm transition-all duration-200"></div>
+                
                 <div id="phase1-container" class="space-y-4">
                     <div class="border-b border-gray-700/60 pb-3 mb-4">
                         <h2 class="text-xl font-black text-white tracking-tight">System Basics</h2>
@@ -164,6 +166,27 @@
     const API_BASE_URL = "https://solar-circle-backend-production.up.railway.app";
     let validPostcodes = [];
 
+    // Notification Control Center
+    function showNotification(message, type = 'error') {
+        const alertBox = document.getElementById('ui-alert');
+        alertBox.innerText = message;
+        
+        // Wipe old classes clean
+        alertBox.classList.remove('hidden', 'bg-red-950/40', 'border-red-500/50', 'text-red-200', 'bg-emerald-950/40', 'border-emerald-500/50', 'text-emerald-200');
+        
+        if (type === 'error') {
+            alertBox.classList.add('bg-red-950/40', 'border', 'border-red-500/50', 'text-red-200');
+        } else if (type === 'success') {
+            alertBox.classList.add('bg-emerald-950/40', 'border', 'border-emerald-500/50', 'text-emerald-200');
+        }
+        
+        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function hideNotification() {
+        document.getElementById('ui-alert').classList.add('hidden');
+    }
+
     // 1. Fetch valid postcode constraints from backend
     async function loadPostcodes() {
         try {
@@ -185,13 +208,12 @@
         document.getElementById('username').value = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}-${randomNum}`;
     }
 
-    // Initialize scripts on system window load
     window.onload = function() { 
         generateRandomUsername(); 
         loadPostcodes(); 
     };
 
-    // Inline field validation for outward postcodes
+    // Inline field border color toggle for postcodes
     document.getElementById('postcode').addEventListener('input', (e) => {
         const input = e.target.value.toUpperCase().trim();
         const field = e.target;
@@ -207,7 +229,6 @@
         }
     });
 
-    // Toggle battery config inputs
     function toggleBatterySize() {
         const hasBattery = document.getElementById('hasBattery').value === 'yes';
         const wrapper = document.getElementById('batterySizeWrapper');
@@ -223,7 +244,7 @@
         }
     }
 
-    // Phase Wizard Step Navigation Control
+    // Wizard Step Navigation
     function goToStep2() {
         const nameField = document.getElementById('username');
         const postcodeField = document.getElementById('postcode');
@@ -232,13 +253,17 @@
         const isBatteryRequired = document.getElementById('hasBattery').value === 'yes';
         const postcodeValue = postcodeField.value.trim().toUpperCase();
 
+        hideNotification();
+
+        // Validate structure properties layout
         if (!nameField.checkValidity() || !postcodeField.checkValidity() || !capacityField.checkValidity() || (isBatteryRequired && !batteryField.checkValidity())) {
-            alert("Please fill out all hardware properties correctly before proceeding.");
+            showNotification("Please fill out all hardware properties correctly before proceeding.", "error");
             return;
         }
 
+        // Validate regional outward code scope 
         if (validPostcodes.length > 0 && !validPostcodes.includes(postcodeValue)) {
-            alert("Please check your postcode. Please note: We only accept the first part of the postcode.");
+            showNotification(`The outward postcode '${postcodeValue}' is not recognized on our network. Please provide only the first half of a valid UK postcode (e.g. SS7).`, "error");
             postcodeField.focus();
             return;
         }
@@ -246,7 +271,7 @@
         document.getElementById('phase1-container').classList.add('hidden');
         document.getElementById('phase2-container').classList.remove('hidden');
         
-        // Update the UI badges
+        // Update visual step indicator markers
         document.getElementById('badge-step2').classList.replace('bg-gray-800', 'bg-yellow-500');
         document.getElementById('badge-step2').classList.replace('text-gray-400', 'text-gray-900');
         document.getElementById('text-step2').classList.replace('text-gray-500', 'text-white');
@@ -256,10 +281,10 @@
     }
 
     function goToStep1() {
+        hideNotification();
         document.getElementById('phase2-container').classList.add('hidden');
         document.getElementById('phase1-container').classList.remove('hidden');
         
-        // Restore step badges
         document.getElementById('badge-step1').classList.replace('bg-gray-800', 'bg-yellow-500');
         document.getElementById('badge-step1').classList.replace('text-gray-400', 'text-gray-900');
         document.getElementById('text-step1').classList.replace('text-gray-500', 'text-white');
@@ -268,10 +293,14 @@
         document.getElementById('text-step2').classList.replace('text-white', 'text-gray-500');
     }
 
-    // Submit payload to Railway pipeline
+    // Server Dispatch Payload Process
     async function handleFormSubmit(event) {
         event.preventDefault();
+        hideNotification();
         
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerText;
+
         const payload = {
             username: document.getElementById('username').value.trim(),
             postcode: document.getElementById('postcode').value.trim().toUpperCase(),
@@ -287,6 +316,9 @@
         };
 
         try {
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Encrypting & Syncing Link...";
+
             const response = await fetch(`${API_BASE_URL}/api/register_user`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -296,13 +328,19 @@
             const result = await response.json();
 
             if (response.ok || result.status === "success") {
-                alert("System linked successfully!");
-                window.location.href = "index.html";
+                showNotification("Success! System telemetry cleanly synchronized. Routing back to main dashboard...", "success");
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 2500);
             } else {
-                alert(`Sync Rejected: ${result.message}`);
+                showNotification(`Sync Rejected: ${result.message || 'Check key configuration permissions.'}`, "error");
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
             }
         } catch (err) {
-            alert("Connection error. Ensure the backend is running.");
+            showNotification("Connection error. Could not connect to the cloud verification layer on Railway.", "error");
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
         }
     }
 </script>
