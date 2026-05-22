@@ -75,29 +75,29 @@
                     </div>
 
                     <div>
-    <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Array Orientation Layout</label>
-    <select id="orientation" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 text-sm font-medium">
-        <option value="south">South (S)</option>
-        <option value="east_west">East / West Split (E/W)</option>
-        <option value="north_south">North / South Split (N/S)</option>
-        <option value="southeast">Southeast (SE)</option>
-        <option value="southwest">Southwest (SW)</option>
-        <option value="east">East (E)</option>
-        <option value="west">West (W)</option>
-        <option value="north">North (N)</option>
-        <option value="northeast">Northeast (NE)</option>
-        <option value="northwest">Northwest (NW)</option>
-    </select>
-    <span class="block text-[10px] text-gray-500 mt-1">Select the one that is closest to your scenario.</span>
-</div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Array Orientation Layout</label>
+                        <select id="orientation" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 text-sm font-medium">
+                            <option value="south">South (S)</option>
+                            <option value="east_west">East / West Split (E/W)</option>
+                            <option value="north_south">North / South Split (N/S)</option>
+                            <option value="southeast">Southeast (SE)</option>
+                            <option value="southwest">Southwest (SW)</option>
+                            <option value="east">East (E)</option>
+                            <option value="west">West (W)</option>
+                            <option value="north">North (N)</option>
+                            <option value="northeast">Northeast (NE)</option>
+                            <option value="northwest">Northwest (NW)</option>
+                        </select>
+                        <span class="block text-[10px] text-gray-500 mt-1">Select the one that is closest to your scenario.</span>
+                    </div>
 
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Local Obstruction Factors</label>
                         <select id="shading" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 text-sm font-medium">
-                            <option value="none">None — <span class="text-xs text-gray-400 font-normal">Completely clear sky</span></option>
-                            <option value="light">Light Shading — <span class="text-xs text-gray-400 font-normal">Minor chimney / pipe wires</span></option>
-                            <option value="moderate">Moderate Shading — <span class="text-xs text-gray-400 font-normal">Nearby tree branch outlines</span></option>
-                            <option value="heavy">Heavy Shading — <span class="text-xs text-gray-400 font-normal">Significant foliage blocking light</span></option>
+                            <option value="none">None — Completely clear sky</option>
+                            <option value="light">Light Shading — Minor chimney / pipe wires</option>
+                            <option value="moderate">Moderate Shading — Nearby tree branch outlines</option>
+                            <option value="heavy">Heavy Shading — Significant foliage blocking light</option>
                         </select>
                     </div>
 
@@ -120,7 +120,7 @@
                     </div>
 
                     <div class="bg-gray-900/60 border border-gray-700/80 rounded-lg p-4 text-xs space-y-2 leading-relaxed">
-                        <div class="flex justify-between items-center">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <p class="font-bold text-yellow-400 uppercase tracking-wide">💡 Need help finding your API credentials?</p>
                             <a href="https://solis-service.solisinverters.com/en/support/solutions/articles/44002212561-request-api-access-soliscloud" target="_blank" class="text-amber-400 font-black underline hover:text-amber-300">View Official Setup Guide ↗</a>
                         </div>
@@ -161,20 +161,23 @@
     </footer>
 
     <script>
+    const API_BASE_URL = "https://solar-circle-backend-production.up.railway.app";
     let validPostcodes = [];
 
-    // 1. Fetch the data
+    // 1. Fetch valid postcode constraints from backend
     async function loadPostcodes() {
         try {
-            const response = await fetch('/static/valid_postcodes.json');
-            validPostcodes = await response.json();
-            console.log("Postcode validation list loaded.");
+            const response = await fetch(`${API_BASE_URL}/api/valid-postcodes`);
+            if (response.ok) {
+                validPostcodes = await response.json();
+                console.log("Postcode validation list loaded.");
+            }
         } catch (err) {
             console.error("Could not load postcode list", err);
         }
     }
 
-    // 2. Generate Username
+    // 2. Generate Fallback Username Pseudonym
     function generateRandomUsername() {
         const prefixes = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt", "Grid", "Photon"];
         const suffixes = ["Ranger", "Chaser", "Core", "Nexus", "Pulse", "Forge", "Captain", "Vault"];
@@ -182,13 +185,13 @@
         document.getElementById('username').value = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}-${randomNum}`;
     }
 
-    // 3. Combined Window Onload
+    // Initialize scripts on system window load
     window.onload = function() { 
         generateRandomUsername(); 
         loadPostcodes(); 
     };
 
-    // 4. Input Validation Logic
+    // Inline field validation for outward postcodes
     document.getElementById('postcode').addEventListener('input', (e) => {
         const input = e.target.value.toUpperCase().trim();
         const field = e.target;
@@ -204,7 +207,7 @@
         }
     });
 
-    // 5. Existing Functions
+    // Toggle battery config inputs
     function toggleBatterySize() {
         const hasBattery = document.getElementById('hasBattery').value === 'yes';
         const wrapper = document.getElementById('batterySizeWrapper');
@@ -220,103 +223,86 @@
         }
     }
 
+    // Phase Wizard Step Navigation Control
     function goToStep2() {
-    const nameField = document.getElementById('username');
-    const postcodeField = document.getElementById('postcode');
-    const capacityField = document.getElementById('capacity');
-    const batteryField = document.getElementById('batterySize');
-    const isBatteryRequired = document.getElementById('hasBattery').value === 'yes';
-    
-    // Get the current value
-    const postcodeValue = postcodeField.value.trim().toUpperCase();
+        const nameField = document.getElementById('username');
+        const postcodeField = document.getElementById('postcode');
+        const capacityField = document.getElementById('capacity');
+        const batteryField = document.getElementById('batterySize');
+        const isBatteryRequired = document.getElementById('hasBattery').value === 'yes';
+        const postcodeValue = postcodeField.value.trim().toUpperCase();
 
-    // 1. Check if the fields are empty (standard HTML5 validation)
-    if (!nameField.checkValidity() || !postcodeField.checkValidity() || !capacityField.checkValidity() || (isBatteryRequired && !batteryField.checkValidity())) {
-        alert("Please fill out all hardware properties correctly before proceeding.");
-        return;
+        if (!nameField.checkValidity() || !postcodeField.checkValidity() || !capacityField.checkValidity() || (isBatteryRequired && !batteryField.checkValidity())) {
+            alert("Please fill out all hardware properties correctly before proceeding.");
+            return;
+        }
+
+        if (validPostcodes.length > 0 && !validPostcodes.includes(postcodeValue)) {
+            alert("Please check your postcode. Please note: We only accept the first part of the postcode.");
+            postcodeField.focus();
+            return;
+        }
+
+        document.getElementById('phase1-container').classList.add('hidden');
+        document.getElementById('phase2-container').classList.remove('hidden');
+        
+        // Update the UI badges
+        document.getElementById('badge-step2').classList.replace('bg-gray-800', 'bg-yellow-500');
+        document.getElementById('badge-step2').classList.replace('text-gray-400', 'text-gray-900');
+        document.getElementById('text-step2').classList.replace('text-gray-500', 'text-white');
+        document.getElementById('badge-step1').classList.replace('bg-yellow-500', 'bg-gray-800');
+        document.getElementById('badge-step1').classList.replace('text-gray-900', 'text-gray-400');
+        document.getElementById('text-step1').classList.replace('text-white', 'text-gray-500');
     }
-
-    // 2. THE GATEKEEPER: Check if the postcode is actually in our valid list
-    if (!validPostcodes.includes(postcodeValue)) {
-        alert("Please check your postcode. Please note: We only accept the first part of the postcode.");
-        postcodeField.focus(); // Highlights the box for them
-        return; // Stops the function here, so they can't proceed
-    }
-
-    // 3. If we passed both checks, proceed to the next step
-    document.getElementById('phase1-container').classList.add('hidden');
-    document.getElementById('phase2-container').classList.remove('hidden');
-    
-    // Update the UI badges
-    document.getElementById('badge-step2').classList.replace('bg-gray-800', 'bg-yellow-500');
-    document.getElementById('badge-step2').classList.replace('text-gray-400', 'text-gray-900');
-    document.getElementById('text-step2').classList.replace('text-gray-500', 'text-white');
-    document.getElementById('badge-step1').classList.replace('bg-yellow-500', 'bg-gray-800');
-    document.getElementById('badge-step1').classList.replace('text-gray-900', 'text-gray-400');
-    document.getElementById('text-step1').classList.replace('text-white', 'text-gray-500');
-}
 
     function goToStep1() {
         document.getElementById('phase2-container').classList.add('hidden');
         document.getElementById('phase1-container').classList.remove('hidden');
-        // ... (rest of your step navigation logic)
-    }
-
-   async function handleFormSubmit(event) {
-    event.preventDefault();
-    
-    // Collect all inputs from the form
-    const payload = {
-        username: document.getElementById('username').value.trim(),
-        postcode: document.getElementById('postcode').value.trim().toUpperCase(),
-        capacity: document.getElementById('capacity').value,
-        hasBattery: document.getElementById('hasBattery').value,
-        batterySize: document.getElementById('batterySize').value,
-        orientation: document.getElementById('orientation').value,
-        shading: document.getElementById('shading').value,
-        inverterBrand: document.getElementById('inverterBrand').value,
-        apiKeyId: document.getElementById('apiKeyId').value,
-        apiSecret: document.getElementById('apiSecret').value,
-        inverterSerial: document.getElementById('inverterSerial').value
-    };
-
-    try {
-        const response = await fetch('/api/register_user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
         
-        const result = await response.json();
-
-        if (response.ok) {
-            alert("System linked successfully!");
-            window.location.href = "index.html";
-        } else {
-            alert(`Sync Rejected: ${result.message}`);
-        }
-    } catch (err) {
-        alert("Connection error. Ensure the backend is running.");
+        // Restore step badges
+        document.getElementById('badge-step1').classList.replace('bg-gray-800', 'bg-yellow-500');
+        document.getElementById('badge-step1').classList.replace('text-gray-400', 'text-gray-900');
+        document.getElementById('text-step1').classList.replace('text-gray-500', 'text-white');
+        document.getElementById('badge-step2').classList.replace('bg-yellow-500', 'bg-gray-800');
+        document.getElementById('badge-step2').classList.replace('text-gray-900', 'text-gray-400');
+        document.getElementById('text-step2').classList.replace('text-white', 'text-gray-500');
     }
-}
+
+    // Submit payload to Railway pipeline
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        
+        const payload = {
+            username: document.getElementById('username').value.trim(),
+            postcode: document.getElementById('postcode').value.trim().toUpperCase(),
+            capacity: document.getElementById('capacity').value,
+            hasBattery: document.getElementById('hasBattery').value,
+            batterySize: document.getElementById('batterySize').value || null,
+            orientation: document.getElementById('orientation').value,
+            shading: document.getElementById('shading').value,
+            inverterBrand: document.getElementById('inverterBrand').value,
+            apiKeyId: document.getElementById('apiKeyId').value.trim(),
+            apiSecret: document.getElementById('apiSecret').value.trim(),
+            inverterSerial: document.getElementById('inverterSerial').value.trim()
+        };
 
         try {
-            // Note: Since this is all one app, you can use the relative path: '/api/register_user'
-            const response = await fetch('/api/register_user', {
+            const response = await fetch(`${API_BASE_URL}/api/register_user`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+            
             const result = await response.json();
 
-            if (response.ok && result.status === "success") {
+            if (response.ok || result.status === "success") {
                 alert("System linked successfully!");
                 window.location.href = "index.html";
             } else {
-                alert(`Sync Rejected: ${result.message || 'Check keys.'}`);
+                alert(`Sync Rejected: ${result.message}`);
             }
         } catch (err) {
-            alert("Connection error.");
+            alert("Connection error. Ensure the backend is running.");
         }
     }
 </script>
