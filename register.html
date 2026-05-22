@@ -20,337 +20,214 @@
         </div>
     </header>
 
-    <main class="max-w-xl mx-auto p-4 w-full my-auto">
-        
-        <div class="mb-6 flex justify-between items-center px-2">
-            <div class="flex items-center gap-3">
-                <div id="badge-step1" class="w-6 h-6 rounded-full bg-yellow-500 text-gray-900 font-black text-xs flex items-center justify-center transition-all">1</div>
-                <span id="text-step1" class="text-xs font-bold uppercase tracking-wide text-white">Array Layout</span>
+  <main class="max-w-md mx-auto px-4 py-12">
+    <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-2xl">
+        <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight text-center">Join the Circle</h2>
+        <p class="text-xs text-gray-400 text-center mb-6">Create your account to start tracking your generation data live.</p>
+
+        <form id="registrationForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email Address</label>
+                <input type="email" id="regEmail" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
             </div>
-            <div class="h-[1px] bg-gray-700 flex-grow mx-4"></div>
-            <div class="flex items-center gap-3">
-                <div id="badge-step2" class="w-6 h-6 rounded-full bg-gray-800 text-gray-400 font-bold text-xs flex items-center justify-center transition-all border border-gray-700">2</div>
-                <span id="text-step2" class="text-xs font-bold uppercase tracking-wide text-gray-500">Secure API Link</span>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Password</label>
+                <input type="password" id="regPassword" required minlength="6" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
             </div>
-        </div>
 
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 sm:p-8 shadow-2xl">
-            <form id="multiStepForm" onsubmit="handleFormSubmit(event)">
-                
-                <div id="ui-alert" class="hidden border rounded-lg p-4 mb-6 text-sm transition-all duration-200"></div>
-                
-                <div id="phase1-container" class="space-y-4">
-                    <div class="border-b border-gray-700/60 pb-3 mb-4">
-                        <h2 class="text-xl font-black text-white tracking-tight">System Basics</h2>
-                        <p class="text-xs text-gray-400 mt-1">Tell us how your array is positioned so we can calibrate your local efficiency tracking models.</p>
-                    </div>
+            <hr class="border-gray-700 my-4" />
 
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Public Username</label>
-                        <input type="text" id="username" required placeholder="e.g. SolarKing" pattern="^(?!.*(fuck|shit|piss|cunt|asshole|bitch)).*$" title="Profanity is restricted." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-semibold tracking-wide">
-                        <span class="block text-[10px] text-gray-500 mt-1">Don't want to use your real name? We generated a temporary fallback pseudonym above.</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Outward Postcode</label>
-                            <input type="text" id="postcode" required maxlength="4" placeholder="..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-black tracking-widest uppercase">
-                            <span class="block text-[10px] text-gray-500 mt-1">First part only.</span>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">System Size <span class="text-gray-500 font-mono">(kWp)</span></label>
-                            <input type="number" id="capacity" required step="0.01" min="0.1" placeholder="e.g. 5.45" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-mono font-bold">
-                            <span class="block text-[10px] text-gray-500 mt-1">Total combined panel rating.</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Battery Backup Storage?</label>
-                            <select id="hasBattery" onchange="toggleBatterySize()" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-medium text-sm">
-                                <option value="no">No Battery System</option>
-                                <option value="yes">Yes, Storage Installed</option>
-                            </select>
-                        </div>
-                        <div id="batterySizeWrapper" class="opacity-40 pointer-events-none transition-all duration-200">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Battery Capacity <span class="text-gray-500 font-mono">(kWh)</span></label>
-                            <input type="number" id="batterySize" step="0.1" min="0.1" placeholder="e.g. 10.4" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-mono">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Array Orientation Layout</label>
-                        <select id="orientation" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 text-sm font-medium">
-                            <option value="south">South (S)</option>
-                            <option value="east_west">East / West Split (E/W)</option>
-                            <option value="north_south">North / South Split (N/S)</option>
-                            <option value="southeast">Southeast (SE)</option>
-                            <option value="southwest">Southwest (SW)</option>
-                            <option value="east">East (E)</option>
-                            <option value="west">West (W)</option>
-                            <option value="north">North (N)</option>
-                            <option value="northeast">Northeast (NE)</option>
-                            <option value="northwest">Northwest (NW)</option>
-                        </select>
-                        <span class="block text-[10px] text-gray-500 mt-1">Select the one that is closest to your scenario.</span>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Local Obstruction Factors</label>
-                        <select id="shading" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 text-sm font-medium">
-                            <option value="none">None — Completely clear sky</option>
-                            <option value="light">Light Shading — Minor chimney / pipe wires</option>
-                            <option value="moderate">Moderate Shading — Nearby tree branch outlines</option>
-                            <option value="heavy">Heavy Shading — Significant foliage blocking light</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Inverter Equipment Brand <span class="text-[10px] text-gray-500 font-medium normal-case block sm:inline sm:ml-1">(please be aware we only currently support Solis)</span></label>
-                        <select id="inverterBrand" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 text-sm font-bold tracking-wide">
-                            <option value="solis">Solis Technologies</option>
-                        </select>
-                    </div>
-
-                    <button type="button" onclick="goToStep2()" class="w-full mt-4 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 font-black py-4 rounded-lg transition-all shadow-lg text-sm uppercase tracking-wider">
-                        Save and Proceed &rarr;
-                    </button>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Leaderboard Username</label>
+                <input type="text" id="regUsername" required placeholder="e.g. SolarPowerEssex" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Outward Postcode</label>
+                    <input type="text" id="regPostcode" required maxlength="4" placeholder="e.g. SS7" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm uppercase font-mono">
                 </div>
-
-                <div id="phase2-container" class="space-y-4 hidden">
-                    <div class="border-b border-gray-700/60 pb-3 mb-4">
-                        <h2 class="text-xl font-black text-white tracking-tight flex items-center gap-2">🔐 Telemetry Link Setup</h2>
-                        <p class="text-xs text-gray-400 mt-1">Connect your secure API keys to pull live telemetry updates onto the community map dashboard.</p>
-                    </div>
-
-                    <div class="bg-gray-900/60 border border-gray-700/80 rounded-lg p-4 text-xs space-y-2 leading-relaxed">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <p class="font-bold text-yellow-400 uppercase tracking-wide">💡 Need help finding your API credentials?</p>
-                            <a href="https://solis-service.solisinverters.com/en/support/solutions/articles/44002212561-request-api-access-soliscloud" target="_blank" class="text-amber-400 font-black underline hover:text-amber-300">View Official Setup Guide ↗</a>
-                        </div>
-                        <p class="text-gray-300 text-[11px]">To maintain real-time tracking accuracy, connections are safely isolated, encrypted end-to-end, and saved within a protected security vault layer.</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Solis Key ID <span class="text-gray-500 font-mono">(Key ID)</span></label>
-                        <input type="text" id="apiKeyId" placeholder="e.g. 130022394850112" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-mono text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Solis Key Secret <span class="text-gray-500 font-mono">(Secret Key)</span></label>
-                        <input type="password" id="apiSecret" placeholder="••••••••••••••••••••••••••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-mono text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Solis Inverter Device Serial ID</label>
-                        <input type="text" id="inverterSerial" placeholder="e.g. 110C8223B005" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-mono uppercase text-sm font-bold tracking-wider">
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-3 pt-2">
-                        <button type="button" onclick="goToStep1()" class="col-span-1 bg-gray-900 hover:bg-gray-700 text-gray-300 border border-gray-700 font-bold py-3 rounded-lg text-xs uppercase tracking-wider transition-colors">
-                            &larr; Back
-                        </button>
-                        <button type="submit" class="col-span-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-gray-900 font-black py-3 rounded-lg text-xs uppercase tracking-wider shadow-md">
-                            Complete Synchronization 🎉
-                        </button>
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">System Size (kWp)</label>
+                    <input type="number" id="regSize" required step="0.01" placeholder="e.g. 7.92" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm font-mono">
                 </div>
+            </div>
 
-            </form>
-        </div>
-    </main>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Array Orientation</label>
+                <select id="regOrientation" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+                    <option value="south">South (S)</option>
+                    <option value="east_west">East / West Split (E/W)</option>
+                    <option value="north_south">North / South Split (N/S)</option>
+                    <option value="southeast">Southeast (SE)</option>
+                    <option value="southwest">Southwest (SW)</option>
+                    <option value="east">East (E)</option>
+                    <option value="west">West (W)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Inverter Manufacturer</label>
+                <select id="regInverterBrand" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
+                    <option value="solis">Solis</option>
+                    <option value="givenergy">GivEnergy</option>
+                    <option value="growatt">Growatt</option>
+                    <option value="solar_edge">SolarEdge</option>
+                </select>
+            </div>
+
+            <div id="formMsg" class="hidden text-xs font-bold p-3 rounded-lg text-center"></div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 font-black py-3 rounded-lg transition-all shadow-lg text-xs uppercase tracking-wide mt-2">
+                Create Account ☀️
+            </button>
+        </form>
+    </div>
+</main>
 
     <footer class="p-4 border-t border-gray-800 text-center text-[11px] text-gray-600">
         Solar Circle UK Platform • Secure Onboarding Portal • 2026
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-    const API_BASE_URL = "https://solar-circle-backend-production.up.railway.app";
-    let validPostcodes = [];
+       // ==========================================================================
+// 1. INITIALIZE GLOBAL CONTEXTS & SUPABASE CLIENT
+// ==========================================================================
+const supabaseUrl = 'https://czclwtgzgndvmmzkzvhw.supabase.co'; // Swap with your actual project URL
+const supabaseAnonKey = 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j'; // Swap with your actual anon key
+const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-    // Notification Control Center
-    function showNotification(message, type = 'error') {
-        const alertBox = document.getElementById('ui-alert');
-        alertBox.innerText = message;
-        
-        // Wipe old classes clean
-        alertBox.classList.remove('hidden', 'bg-red-950/40', 'border-red-500/50', 'text-red-200', 'bg-emerald-950/40', 'border-emerald-500/50', 'text-emerald-200');
-        
-        if (type === 'error') {
-            alertBox.classList.add('bg-red-950/40', 'border', 'border-red-500/50', 'text-red-200');
-        } else if (type === 'success') {
-            alertBox.classList.add('bg-emerald-950/40', 'border', 'border-emerald-500/50', 'text-emerald-200');
+const API_BASE_URL = "https://solar-circle-backend-production.up.railway.app";
+let validPostcodes = [];
+
+// ==========================================================================
+// 2. UI FEEDBACK NOTIFICATION CENTER
+// ==========================================================================
+function showNotification(message, type = 'error') {
+    const msgBlock = document.getElementById('formMsg');
+    if (!msgBlock) return;
+    
+    msgBlock.innerText = message;
+    msgBlock.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'bg-emerald-500/10', 'text-emerald-400');
+    
+    if (type === 'error') {
+        msgBlock.classList.add('bg-red-500/10', 'text-red-400');
+    } else if (type === 'success') {
+        msgBlock.classList.add('bg-emerald-500/10', 'text-emerald-400');
+    }
+}
+
+// ==========================================================================
+// 3. BACKGROUND NETWORK LOADS
+// ==========================================================================
+async function loadPostcodes() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/valid-postcodes`);
+        if (response.ok) {
+            validPostcodes = await response.json();
+            console.log("Postcode validation registry successfully loaded.");
+            
+            if (validPostcodes && validPostcodes.length > 0) {
+                const primaryExample = validPostcodes[0].toUpperCase();
+                document.getElementById('regPostcode').placeholder = `e.g. ${primaryExample}`;
+            }
         }
-        
-        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+        console.error("Could not seed local postcode structural boundaries:", err);
+    }
+}
+
+// ==========================================================================
+// 4. INTERACTIVE LIVE COMPONENT VALIDATION
+// ==========================================================================
+document.getElementById('regPostcode').addEventListener('input', (e) => {
+    const input = e.target.value.toUpperCase().trim();
+    const field = e.target;
+    
+    if (input.length >= 2) {
+        if (validPostcodes.includes(input)) {
+            field.classList.add('border-green-500');
+            field.classList.remove('border-red-500');
+        } else {
+            field.classList.add('border-red-500');
+            field.classList.remove('border-green-500');
+        }
+    }
+});
+
+// ==========================================================================
+// 5. UNIFIED SUPABASE USER CREATION ENGINE
+// ==========================================================================
+document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const msgBlock = document.getElementById('formMsg');
+    msgBlock.classList.add('hidden'); // Close open notification rows
+
+    // 1. Gather text inputs explicitly using the unified IDs present in your HTML
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const username = document.getElementById('regUsername').value.trim();
+    const postcode = document.getElementById('regPostcode').value.trim().toUpperCase();
+    const size = parseFloat(document.getElementById('regSize').value);
+    const orientation = document.getElementById('regOrientation').value;
+    const inverterBrand = document.getElementById('regInverterBrand').value;
+
+    // 2. Client Side structural safety verification step
+    if (validPostcodes.length > 0 && !validPostcodes.includes(postcode)) {
+        showNotification(`The outward postcode '${postcode}' is outside our service network boundaries. Please input a valid regional outward node (e.g. SS7).`, "error");
+        document.getElementById('regPostcode').focus();
+        return;
     }
 
-    function hideNotification() {
-        document.getElementById('ui-alert').classList.add('hidden');
-    }
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerText;
 
-    // Fetch valid postcode constraints from backend and update input placeholders dynamically
-    async function loadPostcodes() {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/valid-postcodes`);
-            if (response.ok) {
-                validPostcodes = await response.json();
-                console.log("Postcode validation list loaded.");
-                
-                // Dynamic check: Use the primary regional element from your loaded array as the example hint
-                if (validPostcodes && validPostcodes.length > 0) {
-                    const primaryExample = validPostcodes[0].toUpperCase();
-                    document.getElementById('postcode').placeholder = `e.g. ${primaryExample}`;
+    try {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Encrypting Credentials...";
+
+        // 3. Dispatch directly to your Supabase project context
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    username: username,
+                    outward_postcode: postcode,
+                    system_size_kwp: size,
+                    orientation: orientation,
+                    inverter_brand: inverterBrand
                 }
             }
-        } catch (err) {
-            console.error("Could not load postcode list", err);
-        }
-    }
+        });
 
-    // Generate Fallback Username Pseudonym
-    function generateRandomUsername() {
-        const prefixes = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt", "Grid", "Photon"];
-        const suffixes = ["Ranger", "Chaser", "Core", "Nexus", "Pulse", "Forge", "Captain", "Vault"];
-        const randomNum = Math.floor(1000 + Math.random() * 9000);
-        document.getElementById('username').value = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}-${randomNum}`;
-    }
+        if (error) throw error;
 
-    window.onload = function() { 
-        generateRandomUsername(); 
-        loadPostcodes(); 
-    };
-
-    // Inline field border color toggle for postcodes
-    document.getElementById('postcode').addEventListener('input', (e) => {
-        const input = e.target.value.toUpperCase().trim();
-        const field = e.target;
+        // 4. On Success, render response window parameters cleanly
+        showNotification("Account created! Check your email inbox for your registration verification confirmation link.", "success");
+        document.getElementById('registrationForm').reset();
         
-        if (input.length >= 2) {
-            if (validPostcodes.includes(input)) {
-                field.classList.add('border-green-500');
-                field.classList.remove('border-red-500');
-            } else {
-                field.classList.add('border-red-500');
-                field.classList.remove('border-green-500');
-            }
-        }
-    });
+        // Remove valid borders on inputs
+        document.getElementById('regPostcode').classList.remove('border-green-500');
 
-    function toggleBatterySize() {
-        const hasBattery = document.getElementById('hasBattery').value === 'yes';
-        const wrapper = document.getElementById('batterySizeWrapper');
-        const input = document.getElementById('batterySize');
-        if (hasBattery) {
-            wrapper.classList.remove('opacity-40', 'pointer-events-none');
-            input.required = true;
-            input.focus();
-        } else {
-            wrapper.classList.add('opacity-40', 'pointer-events-none');
-            input.required = false;
-            input.value = '';
-        }
+        setTimeout(() => {
+            window.location.href = "indexdata.html";
+        }, 3500); // 3.5 second delay so they have time to read the success message
+
+    } catch (err) {
+        showNotification(err.message || "An authentication error code block triggered on database integration.", "error");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
     }
+});
 
-    // Wizard Step Navigation
-    function goToStep2() {
-        const nameField = document.getElementById('username');
-        const postcodeField = document.getElementById('postcode');
-        const capacityField = document.getElementById('capacity');
-        const batteryField = document.getElementById('batterySize');
-        const isBatteryRequired = document.getElementById('hasBattery').value === 'yes';
-        const postcodeValue = postcodeField.value.trim().toUpperCase();
-
-        hideNotification();
-
-        // Validate structure properties layout
-        if (!nameField.checkValidity() || !postcodeField.checkValidity() || !capacityField.checkValidity() || (isBatteryRequired && !batteryField.checkValidity())) {
-            showNotification("Please fill out all hardware properties correctly before proceeding.", "error");
-            return;
-        }
-
-        // Validate regional outward code scope 
-        if (validPostcodes.length > 0 && !validPostcodes.includes(postcodeValue)) {
-            showNotification(`The outward postcode '${postcodeValue}' is not recognized on our network. Please provide only the first half of a valid UK postcode (e.g. SS7).`, "error");
-            postcodeField.focus();
-            return;
-        }
-
-        document.getElementById('phase1-container').classList.add('hidden');
-        document.getElementById('phase2-container').classList.remove('hidden');
-        
-        // Update visual step indicator markers
-        document.getElementById('badge-step2').classList.replace('bg-gray-800', 'bg-yellow-500');
-        document.getElementById('badge-step2').classList.replace('text-gray-400', 'text-gray-900');
-        document.getElementById('text-step2').classList.replace('text-gray-500', 'text-white');
-        document.getElementById('badge-step1').classList.replace('bg-yellow-500', 'bg-gray-800');
-        document.getElementById('badge-step1').classList.replace('text-gray-900', 'text-gray-400');
-        document.getElementById('text-step1').classList.replace('text-white', 'text-gray-500');
-    }
-
-    function goToStep1() {
-        hideNotification();
-        document.getElementById('phase2-container').classList.add('hidden');
-        document.getElementById('phase1-container').classList.remove('hidden');
-        
-        document.getElementById('badge-step1').classList.replace('bg-gray-800', 'bg-yellow-500');
-        document.getElementById('badge-step1').classList.replace('text-gray-400', 'text-gray-900');
-        document.getElementById('text-step1').classList.replace('text-gray-500', 'text-white');
-        document.getElementById('badge-step2').classList.replace('bg-yellow-500', 'bg-gray-800');
-        document.getElementById('badge-step2').classList.replace('text-gray-900', 'text-gray-400');
-        document.getElementById('text-step2').classList.replace('text-white', 'text-gray-500');
-    }
-
-    // Server Dispatch Payload Process
-    async function handleFormSubmit(event) {
-        event.preventDefault();
-        hideNotification();
-        
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerText;
-
-        const payload = {
-            username: document.getElementById('username').value.trim(),
-            postcode: document.getElementById('postcode').value.trim().toUpperCase(),
-            capacity: document.getElementById('capacity').value,
-            hasBattery: document.getElementById('hasBattery').value,
-            batterySize: document.getElementById('batterySize').value || null,
-            orientation: document.getElementById('orientation').value,
-            shading: document.getElementById('shading').value,
-            inverterBrand: document.getElementById('inverterBrand').value,
-            apiKeyId: document.getElementById('apiKeyId').value.trim(),
-            apiSecret: document.getElementById('apiSecret').value.trim(),
-            inverterSerial: document.getElementById('inverterSerial').value.trim()
-        };
-
-        try {
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Encrypting & Syncing Link...";
-
-            const response = await fetch(`${API_BASE_URL}/api/register_user`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            
-            const result = await response.json();
-
-            if (response.ok || result.status === "success") {
-                showNotification("Success! System telemetry cleanly synchronized. Routing back to main dashboard...", "success");
-                setTimeout(() => {
-                    window.location.href = "index.html";
-                }, 2500);
-            } else {
-                showNotification(`Sync Rejected: ${result.message || 'Check key configuration permissions.'}`, "error");
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalBtnText;
-            }
-        } catch (err) {
-            showNotification("Connection error. Could not connect to the cloud verification layer on Railway.", "error");
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalBtnText;
-        }
-    }
+// ==========================================================================
+// 6. INITIALIZATION DEPLOYMENT CORNER
+// ==========================================================================
+window.onload = function() { 
+    loadPostcodes(); 
+};
 </script>
 </body>
 </html>
