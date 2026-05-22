@@ -266,10 +266,31 @@
         </tr>
     `).join('');
 }
-        window.onload = function() { 
-            loadLiveSolarCircleData(); 
-            document.getElementById("searchBtn").addEventListener("click", loadLiveSolarCircleData);
-        };
+       // A pool of example postcodes to rotate through as placeholder suggestions
+const structuralPostcodePool = [
+    "SS7", "SS9", "CM1", "RM11", "CB1", "CO1", "IG1", "E17", "ME14", "TN1"
+];
+
+window.onload = function() { 
+    // 1. Pick a random postcode for the placeholder suggestion
+    const randomIndex = Math.floor(Math.random() * structuralPostcodePool.length);
+    const suggestedPostcode = structuralPostcodePool[randomIndex];
+    
+    // 2. Apply it cleanly to the input placeholder attribute
+    const inputElement = document.getElementById("postcodeInput");
+    inputElement.placeholder = `e.g. ${suggestedPostcode}`;
+    
+    // 3. Bind the search event button (But DO NOT call loadLiveSolarCircleData() here)
+    document.getElementById("searchBtn").addEventListener("click", loadLiveSolarCircleData);
+
+    // Optional: Allow the user to just press "Enter" inside the input box to trigger search
+    inputElement.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            loadLiveSolarCircleData();
+        }
+    });
+};
     </script>
 </body>
 </html>
