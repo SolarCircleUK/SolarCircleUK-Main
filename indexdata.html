@@ -182,7 +182,9 @@
             dashboardSection.classList.remove("hidden");
             updateSummaryCards(targetPostcode);
         } else {
-            // Friendly message without the fallback redirect
+            // REVEAL the dashboard container so the empty message is actually visible!
+            dashboardSection.classList.remove("hidden");
+            
             tableBody.innerHTML = `
                 <tr>
                     <td colspan='8' class='text-center py-10 text-gray-400'>
@@ -195,6 +197,8 @@
                 </tr>`;
         }
     } catch (error) {
+        // REVEAL the dashboard container here too so the connection error can be seen
+        dashboardSection.classList.remove("hidden");
         tableBody.innerHTML = "<tr><td colspan='8' class='text-center py-10 text-red-400'>Connection error. Please try again later.</td></tr>";
     }
 }
