@@ -10,12 +10,10 @@
 
     <header class="border-b border-gray-800 bg-gray-900 px-4 py-4">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <div class="flex flex-col">
-               <a href="indexdata.html" class="flex flex-col group transition-opacity hover:opacity-90">
+             <a href="indexdata.html" class="flex flex-col group transition-opacity hover:opacity-90">
                     <span class="text-xl font-black tracking-tight bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">SOLAR CIRCLE</span>
                     <span class="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-amber-400 font-bold mt-0.5 transition-colors">Real Data. Shared Simply.</span>
-                </a>
-            </div>
+            </a>
             <a href="indexdata.html" class="text-xs font-bold text-gray-400 hover:text-white transition-colors">&larr; Exit to Dashboard</a>
         </div>
     </header>
@@ -23,11 +21,9 @@
     <main class="max-w-md mx-auto px-4 py-12">
         <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-2xl">
             <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight text-center">Join the Circle</h2>
-            <p class="text-xs text-gray-400 text-center mb-6">Create your account to start tracking your generation data live.</p>
-
             <form id="registrationForm" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email Address</label>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email</label>
                     <input type="email" id="regEmail" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
                 </div>
                 <div>
@@ -37,162 +33,89 @@
 
                 <hr class="border-gray-700 my-4" />
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Leaderboard Username</label>
-                    <input type="text" id="regUsername" required placeholder="e.g. SolarPowerEssex" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Outward Postcode</label>
-                        <input type="text" id="regPostcode" required maxlength="4" placeholder="e.g. SS7" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm uppercase font-mono">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Username</label>
+                        <input type="text" id="regUsername" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">System Size (kWp)</label>
-                        <input type="number" id="regSize" required step="0.01" placeholder="e.g. 7.92" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm font-mono">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">System (kWp)</label>
+                        <input type="number" id="regSize" required step="0.01" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
                     </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Array Orientation</label>
-                    <select id="regOrientation" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-                        <option value="south">South (S)</option>
-                        <option value="east_west">East / West Split (E/W)</option>
-                        <option value="north_south">North / South Split (N/S)</option>
-                        <option value="southeast">Southeast (SE)</option>
-                        <option value="southwest">Southwest (SW)</option>
-                        <option value="east">East (E)</option>
-                        <option value="west">West (W)</option>
-                    </select>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Inverter Manufacturer</label>
-                    <select id="regInverterBrand" required class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm">
-                        <option value="solis">Solis</option>
-                        <option value="givenergy">GivEnergy</option>
-                        <option value="growatt">Growatt</option>
-                        <option value="solar_edge">SolarEdge</option>
+                    <select id="regInverterBrand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                        <option value="solis">Solis (Supported)</option>
                     </select>
                 </div>
 
-                <div id="formMsg" class="hidden text-xs font-bold p-3 rounded-lg text-center"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Battery?</label>
+                        <select id="regHasBattery" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Battery Size (kWh)</label>
+                        <input type="number" id="regBatterySize" placeholder="0.00" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                    </div>
+                </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 font-black py-3 rounded-lg transition-all shadow-lg text-xs uppercase tracking-wide mt-2">
-                    Create Account ☀️
-                </button>
+                <div class="pt-2 border-t border-gray-700">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-2">Optional Hardware Details</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="regPanelBrand" placeholder="Panel Brand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                        <input type="text" id="regPanelRating" placeholder="Panel Wattage" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                    </div>
+                    <input type="text" id="regBatteryBrand" placeholder="Battery Brand (e.g. Pylontech)" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm mt-2">
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 font-black py-3 rounded-lg mt-4">Create Account</button>
             </form>
         </div>
     </main>
 
-    <footer class="p-4 border-t border-gray-800 text-center text-[11px] text-gray-600">
-        Solar Circle UK Platform • Secure Onboarding Portal • 2026
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Initialize logic...
         const supabaseUrl = 'https://czclwtgzgndvmmzkzvhw.supabase.co'; 
         const supabaseAnonKey = 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j'; 
-        const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
-
-        const API_BASE_URL = "https://solar-circle-backend-production.up.railway.app";
-        let validPostcodes = [];
-
-        function showNotification(message, type = 'error') {
-            const msgBlock = document.getElementById('formMsg');
-            if (!msgBlock) return;
-            
-            msgBlock.innerText = message;
-            msgBlock.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'bg-emerald-500/10', 'text-emerald-400');
-            
-            if (type === 'error') {
-                msgBlock.classList.add('bg-red-500/10', 'text-red-400');
-            } else if (type === 'success') {
-                msgBlock.classList.add('bg-emerald-500/10', 'text-emerald-400');
-            }
-        }
-
-        async function loadPostcodes() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/valid-postcodes`);
-                if (response.ok) {
-                    validPostcodes = await response.json();
-                    if (validPostcodes && validPostcodes.length > 0) {
-                        const primaryExample = validPostcodes[0].toUpperCase();
-                        document.getElementById('regPostcode').placeholder = `e.g. ${primaryExample}`;
-                    }
-                }
-            } catch (err) {
-                console.error("Could not seed local postcode structural boundaries:", err);
-            }
-        }
-
-        document.getElementById('regPostcode').addEventListener('input', (e) => {
-            const input = e.target.value.toUpperCase().trim();
-            const field = e.target;
-            if (input.length >= 2) {
-                if (validPostcodes.includes(input)) {
-                    field.classList.add('border-green-500');
-                    field.classList.remove('border-red-500');
-                } else {
-                    field.classList.add('border-red-500');
-                    field.classList.remove('border-green-500');
-                }
-            }
-        });
-
-        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const msgBlock = document.getElementById('formMsg');
-            msgBlock.classList.add('hidden'); 
-
-            const email = document.getElementById('regEmail').value.trim();
-            const password = document.getElementById('regPassword').value;
-            const username = document.getElementById('regUsername').value.trim();
-            const postcode = document.getElementById('regPostcode').value.trim().toUpperCase();
-            const size = parseFloat(document.getElementById('regSize').value);
-            const orientation = document.getElementById('regOrientation').value;
-            const inverterBrand = document.getElementById('regInverterBrand').value;
-
-            if (validPostcodes.length > 0 && !validPostcodes.includes(postcode)) {
-                showNotification("Postcode outside service network.", "error");
-                return;
-            }
-
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Encrypting...";
-
-            try {
-                const { error } = await supabase.auth.signUp({
-                    email, password,
-                    options: { data: { username, outward_postcode: postcode, system_size_kwp: size, orientation, inverter_brand: inverterBrand } }
-                });
-                if (error) throw error;
-
-                showNotification("Account created! Check your email.", "success");
-                document.getElementById('registrationForm').reset();
-                generateSolarUsername(); // Call the shared function here
-                
-                setTimeout(() => window.location.href = "indexdata.html", 3500);
-            } catch (err) {
-                showNotification(err.message, "error");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Create Account ☀️";
-            }
-        });
+        window.supabase = window.supabase || supabase.createClient(supabaseUrl, supabaseAnonKey);
 
         function generateSolarUsername() {
-            const prefixes = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt", "Grid", "Photon", "Array", "Aiko"];
-            const suffixes = ["Ranger", "Chaser", "Core", "Nexus", "Pulse", "Forge", "Captain", "Vault", "Ninja", "Gen"];
-            const randomNum = Math.floor(1000 + Math.random() * 9000);
-            const p = prefixes[Math.floor(Math.random() * prefixes.length)];
-            const s = suffixes[Math.floor(Math.random() * suffixes.length)];
-            const field = document.getElementById('regUsername');
-            if (field) field.value = `${p}${s}-${randomNum}`;
+            const p = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt"][Math.floor(Math.random() * 6)];
+            const s = ["Ranger", "Chaser", "Core", "Nexus", "Pulse"][Math.floor(Math.random() * 5)];
+            document.getElementById('regUsername').value = `${p}${s}-${Math.floor(1000 + Math.random() * 9000)}`;
         }
 
-        window.onload = () => { generateSolarUsername(); loadPostcodes(); };
+        document.addEventListener('DOMContentLoaded', generateSolarUsername);
+        
+        // Handle registration with new fields
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById('regUsername').value,
+                system_size_kwp: document.getElementById('regSize').value,
+                has_battery: document.getElementById('regHasBattery').value,
+                battery_size: document.getElementById('regBatterySize').value,
+                panel_brand: document.getElementById('regPanelBrand').value,
+                panel_rating: document.getElementById('regPanelRating').value,
+                battery_brand: document.getElementById('regBatteryBrand').value
+            };
+            
+            const { error } = await window.supabase.auth.signUp({
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                options: { data }
+            });
+
+            if (error) alert(error.message);
+            else alert("Account created! Redirecting to dashboard...");
+        });
     </script>
 </body>
 </html>
