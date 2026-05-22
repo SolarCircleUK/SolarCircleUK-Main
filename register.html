@@ -90,9 +90,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ==========================================================================
-        // 1. INITIALIZE GLOBAL CONTEXTS & SUPABASE CLIENT
-        // ==========================================================================
         const supabaseUrl = 'https://czclwtgzgndvmmzkzvhw.supabase.co'; 
         const supabaseAnonKey = 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j'; 
         const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
@@ -100,9 +97,6 @@
         const API_BASE_URL = "https://solar-circle-backend-production.up.railway.app";
         let validPostcodes = [];
 
-        // ==========================================================================
-        // 2. UI FEEDBACK NOTIFICATION CENTER
-        // ==========================================================================
         function showNotification(message, type = 'error') {
             const msgBlock = document.getElementById('formMsg');
             if (!msgBlock) return;
@@ -117,16 +111,11 @@
             }
         }
 
-        // ==========================================================================
-        // 3. BACKGROUND NETWORK LOADS
-        // ==========================================================================
         async function loadPostcodes() {
             try {
                 const response = await fetch(`${API_BASE_URL}/api/valid-postcodes`);
                 if (response.ok) {
                     validPostcodes = await response.json();
-                    console.log("Postcode validation registry successfully loaded.");
-                    
                     if (validPostcodes && validPostcodes.length > 0) {
                         const primaryExample = validPostcodes[0].toUpperCase();
                         document.getElementById('regPostcode').placeholder = `e.g. ${primaryExample}`;
@@ -137,13 +126,9 @@
             }
         }
 
-        // ==========================================================================
-        // 4. INTERACTIVE LIVE COMPONENT VALIDATION
-        // ==========================================================================
         document.getElementById('regPostcode').addEventListener('input', (e) => {
             const input = e.target.value.toUpperCase().trim();
             const field = e.target;
-            
             if (input.length >= 2) {
                 if (validPostcodes.includes(input)) {
                     field.classList.add('border-green-500');
@@ -155,12 +140,8 @@
             }
         });
 
-        // ==========================================================================
-        // 5. UNIFIED SUPABASE USER CREATION ENGINE
-        // ==========================================================================
         document.getElementById('registrationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const msgBlock = document.getElementById('formMsg');
             msgBlock.classList.add('hidden'); 
 
@@ -173,75 +154,45 @@
             const inverterBrand = document.getElementById('regInverterBrand').value;
 
             if (validPostcodes.length > 0 && !validPostcodes.includes(postcode)) {
-                showNotification(`The outward postcode '${postcode}' is outside our service network boundaries. Please input a valid regional outward node (e.g. SS7).`, "error");
-                document.getElementById('regPostcode').focus();
+                showNotification("Postcode outside service network.", "error");
                 return;
             }
 
             const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Encrypting...";
 
             try {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "Encrypting Credentials...";
-
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            username: username,
-                            outward_postcode: postcode,
-                            system_size_kwp: size,
-                            orientation: orientation,
-                            inverter_brand: inverterBrand
-                        }
-                    }
+                const { error } = await supabase.auth.signUp({
+                    email, password,
+                    options: { data: { username, outward_postcode: postcode, system_size_kwp: size, orientation, inverter_brand: inverterBrand } }
                 });
-
                 if (error) throw error;
 
-                showNotification("Account created! Check your email inbox for your registration verification confirmation link.", "success");
+                showNotification("Account created! Check your email.", "success");
                 document.getElementById('registrationForm').reset();
+                generateSolarUsername(); // Call the shared function here
                 
-                document.getElementById('regPostcode').classList.remove('border-green-500');
-                
-                // Keep the input populated with a fresh fallback name after form resets
-                generateSolarUsername();
-
-                setTimeout(() => {
-                    window.location.href = "indexdata.html";
-                }, 3500); 
-
+                setTimeout(() => window.location.href = "indexdata.html", 3500);
             } catch (err) {
-                showNotification(err.message || "An authentication error code block triggered on database integration.", "error");
+                showNotification(err.message, "error");
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerText = originalBtnText;
+                submitBtn.innerText = "Create Account ☀️";
             }
         });
 
-        // ==========================================================================
-        // 5.5 AUTOMATED UNIQUE USERNAME GENERATOR
-        // ==========================================================================
         function generateSolarUsername() {
             const prefixes = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt", "Grid", "Photon", "Array", "Aiko"];
             const suffixes = ["Ranger", "Chaser", "Core", "Nexus", "Pulse", "Forge", "Captain", "Vault", "Ninja", "Gen"];
             const randomNum = Math.floor(1000 + Math.random() * 9000);
-            
-            const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-            const randomSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-            
-            document.getElementById('regUsername').value = `${randomPrefix}${randomSuffix}-${randomNum}`;
+            const p = prefixes[Math.floor(Math.random() * prefixes.length)];
+            const s = suffixes[Math.floor(Math.random() * suffixes.length)];
+            const field = document.getElementById('regUsername');
+            if (field) field.value = `${p}${s}-${randomNum}`;
         }
 
-        // ==========================================================================
-        // 6. INITIALIZATION DEPLOYMENT CORNER
-        // ==========================================================================
-        window.onload = function() { 
-            generateSolarUsername(); 
-            loadPostcodes(); 
-        };
+        window.onload = () => { generateSolarUsername(); loadPostcodes(); };
     </script>
 </body>
 </html>
