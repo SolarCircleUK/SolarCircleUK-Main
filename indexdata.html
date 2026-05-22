@@ -142,18 +142,17 @@
 
     <script>
 
-        // Add this near the top of your script block
-const supabase = supabase.createClient('https://czclwtgzgndvmmzkzvhw.supabase.co', 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j');
+        // 1. Define Supabase ONLY ONCE
+    const supabase = supabase.createClient('https://czclwtgzgndvmmzkzvhw.supabase.co', 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j');
 
-async function checkAuthState() {
-    const { data } = await supabase.auth.getSession();
-    const container = document.getElementById('authHeaderContainer');
-    
-    // If a session exists, swap the button
-    if (data.session) {
-        container.innerHTML = `<a href="dashboard.html" class="text-white hover:text-yellow-500 font-bold text-xs uppercase tracking-wide transition-colors">My Dashboard</a>`;
+    // 2. Define your function
+    async function checkAuthState() {
+        const { data } = await supabase.auth.getSession();
+        const container = document.getElementById('authHeaderContainer');
+        if (data.session) {
+            container.innerHTML = `<a href="dashboard.html" class="text-white hover:text-yellow-500 font-bold text-xs uppercase tracking-wide transition-colors">My Dashboard</a>`;
+        }
     }
-}
         let currentSortField = 'es'; 
         let currentSortDirection = 'desc';
         let globalPostcodeData = [];
