@@ -72,12 +72,7 @@
                     <p class="text-[10px] text-gray-500 uppercase font-bold mb-2">Optional Details</p>
                     <div class="grid grid-cols-2 gap-4">
                         <input type="text" id="regPanelBrand" placeholder="Panel Brand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
-                        <input type="number" id="regPanelRating" 
-       placeholder="Panel Rating (W)" 
-       maxlength="3" 
-       min="0" 
-       max="999" 
-       class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                        <input type="number" id="regPanelRating" placeholder="Panel Rating (W)" maxlength="3" min="0" max="999" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
                     </div>
                     <input type="text" id="regBatteryBrand" placeholder="Battery Brand" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm mt-2">
                 </div>
@@ -88,10 +83,11 @@
             <div id="apiStep" class="hidden space-y-4">
                 <h2 class="text-2xl font-black text-white text-center">One Last Step!</h2>
                 <p class="text-xs text-gray-400 text-center mb-6">Enter your Solis API details to start syncing.</p>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">API Token</label>
-                    <input type="text" id="apiToken" placeholder="Paste your Solis API Token" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:ring-2 focus:ring-yellow-500 text-sm">
-                </div>
+                
+                <input type="text" id="regKeyId" placeholder="Solis Key ID" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                <input type="text" id="regSecret" placeholder="Solis Secret" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                <input type="text" id="regSerial" placeholder="Inverter Serial" class="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 text-sm">
+                
                 <button onclick="saveApiKeys()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 font-black py-3 rounded-lg uppercase text-xs tracking-widest hover:from-yellow-400 transition-all">Connect API 🚀</button>
             </div>
         </div>
@@ -109,7 +105,6 @@
             batteryInput.disabled = (hasBattery !== 'yes');
         }
 
-        // Logic for Form Submission
         document.getElementById('registrationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const { data: authData, error } = await window.supabase.auth.signUp({
@@ -125,7 +120,7 @@
                 panelBrand: document.getElementById('regPanelBrand').value,
                 panelRating: document.getElementById('regPanelRating').value,
                 batteryBrand: document.getElementById('regBatteryBrand').value,
-                orientation: 'south', // Add defaults if not in form
+                orientation: 'south',
                 shading: 'none',
                 inverterBrand: document.getElementById('regInverterBrand').value
             };
@@ -140,17 +135,21 @@
             document.getElementById('apiStep').classList.remove('hidden');
         });
 
-        // Logic for saving API key
         async function saveApiKeys() {
-            const apiToken = document.getElementById('apiToken').value;
+            const payload = {
+                apiKeyId: document.getElementById('regKeyId').value,
+                apiSecret: document.getElementById('regSecret').value,
+                inverterSerial: document.getElementById('regSerial').value
+            };
+            
             const { data: { session } } = await window.supabase.auth.getSession();
-            const response = await fetch('https://solar-circle-backend-production.up.railway.app/api/save-api-key', {
+            const response = await fetch('https://solar-circle-backend-production.up.railway.app/api/save-solis-keys', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-                body: JSON.stringify({ api_token: apiToken })
+                body: JSON.stringify(payload)
             });
             if (response.ok) window.location.href = "indexdata.html";
-            else alert("Failed to save API key.");
+            else alert("Failed to save Solis keys.");
         }
     </script>
 </body>
