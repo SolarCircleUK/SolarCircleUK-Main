@@ -52,6 +52,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Outward Postcode</label>
+                            <input type="text" id="postcode" required maxlength="4" placeholder="..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 font-black tracking-widest uppercase">
                             <span class="block text-[10px] text-gray-500 mt-1">First part only.</span>
                         </div>
                         <div>
@@ -186,26 +187,26 @@
         document.getElementById('ui-alert').classList.add('hidden');
     }
 
-   // Fetch valid postcode constraints from backend and update input placeholders dynamically
-async function loadPostcodes() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/valid-postcodes`);
-        if (response.ok) {
-            validPostcodes = await response.json();
-            console.log("Postcode validation list loaded.");
-            
-            // Dynamic check: Use the primary regional element from your loaded array as the example hint
-            if (validPostcodes && validPostcodes.length > 0) {
-                const primaryExample = validPostcodes[0].toUpperCase();
-                document.getElementById('postcode').placeholder = `e.g. ${primaryExample}`;
+    // Fetch valid postcode constraints from backend and update input placeholders dynamically
+    async function loadPostcodes() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/valid-postcodes`);
+            if (response.ok) {
+                validPostcodes = await response.json();
+                console.log("Postcode validation list loaded.");
+                
+                // Dynamic check: Use the primary regional element from your loaded array as the example hint
+                if (validPostcodes && validPostcodes.length > 0) {
+                    const primaryExample = validPostcodes[0].toUpperCase();
+                    document.getElementById('postcode').placeholder = `e.g. ${primaryExample}`;
+                }
             }
+        } catch (err) {
+            console.error("Could not load postcode list", err);
         }
-    } catch (err) {
-        console.error("Could not load postcode list", err);
     }
-}
 
-    // 2. Generate Fallback Username Pseudonym
+    // Generate Fallback Username Pseudonym
     function generateRandomUsername() {
         const prefixes = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt", "Grid", "Photon"];
         const suffixes = ["Ranger", "Chaser", "Core", "Nexus", "Pulse", "Forge", "Captain", "Vault"];
