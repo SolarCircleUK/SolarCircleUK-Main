@@ -163,18 +163,18 @@
     <script>
     let validPostcodes = [];
 
-    // 1. Fetch the data from the new Flask API route
+    // 1. Fetch the data
     async function loadPostcodes() {
         try {
-            const response = await fetch('/api/valid-postcodes');
+            const response = await fetch('/static/valid_postcodes.json');
             validPostcodes = await response.json();
-            console.log("Postcode validation list loaded successfully from backend.");
+            console.log("Postcode validation list loaded.");
         } catch (err) {
             console.error("Could not load postcode list", err);
         }
     }
 
-    // 2. Generate Random Pseudonym Username
+    // 2. Generate Username
     function generateRandomUsername() {
         const prefixes = ["Solar", "Eco", "Ray", "Sun", "PV", "Volt", "Grid", "Photon"];
         const suffixes = ["Ranger", "Chaser", "Core", "Nexus", "Pulse", "Forge", "Captain", "Vault"];
@@ -188,7 +188,7 @@
         loadPostcodes(); 
     };
 
-    // 4. Real-time UI Input Validation Border Colors
+    // 4. Input Validation Logic
     document.getElementById('postcode').addEventListener('input', (e) => {
         const input = e.target.value.toUpperCase().trim();
         const field = e.target;
@@ -204,7 +204,7 @@
         }
     });
 
-    // 5. Form Utility & Wizard Step Controls
+    // 5. Existing Functions
     function toggleBatterySize() {
         const hasBattery = document.getElementById('hasBattery').value === 'yes';
         const wrapper = document.getElementById('batterySizeWrapper');
@@ -221,87 +221,102 @@
     }
 
     function goToStep2() {
-        const nameField = document.getElementById('username');
-        const postcodeField = document.getElementById('postcode');
-        const capacityField = document.getElementById('capacity');
-        const batteryField = document.getElementById('batterySize');
-        const isBatteryRequired = document.getElementById('hasBattery').value === 'yes';
-        
-        const postcodeValue = postcodeField.value.trim().toUpperCase();
+    const nameField = document.getElementById('username');
+    const postcodeField = document.getElementById('postcode');
+    const capacityField = document.getElementById('capacity');
+    const batteryField = document.getElementById('batterySize');
+    const isBatteryRequired = document.getElementById('hasBattery').value === 'yes';
+    
+    // Get the current value
+    const postcodeValue = postcodeField.value.trim().toUpperCase();
 
-        // Check if standard elements are empty or failing basic validation rules
-        if (!nameField.checkValidity() || !postcodeField.checkValidity() || !capacityField.checkValidity() || (isBatteryRequired && !batteryField.checkValidity())) {
-            alert("Please fill out all hardware properties correctly before proceeding.");
-            return;
-        }
-
-        // Validate structure against the cached global array registry
-        if (validPostcodes.length > 0 && !validPostcodes.includes(postcodeValue)) {
-            alert("Please check your postcode. Please note: We only accept the first part of a valid UK postcode.");
-            postcodeField.focus(); 
-            return; 
-        }
-
-        document.getElementById('phase1-container').classList.add('hidden');
-        document.getElementById('phase2-container').classList.remove('hidden');
-        
-        // Update UI Badges
-        document.getElementById('badge-step2').classList.replace('bg-gray-800', 'bg-yellow-500');
-        document.getElementById('badge-step2').classList.replace('text-gray-400', 'text-gray-900');
-        document.getElementById('text-step2').classList.replace('text-gray-500', 'text-white');
-        document.getElementById('badge-step1').classList.replace('bg-yellow-500', 'bg-gray-800');
-        document.getElementById('badge-step1').classList.replace('text-gray-900', 'text-gray-400');
-        document.getElementById('text-step1').classList.replace('text-white', 'text-gray-500');
+    // 1. Check if the fields are empty (standard HTML5 validation)
+    if (!nameField.checkValidity() || !postcodeField.checkValidity() || !capacityField.checkValidity() || (isBatteryRequired && !batteryField.checkValidity())) {
+        alert("Please fill out all hardware properties correctly before proceeding.");
+        return;
     }
+
+    // 2. THE GATEKEEPER: Check if the postcode is actually in our valid list
+    if (!validPostcodes.includes(postcodeValue)) {
+        alert("Please check your postcode. Please note: We only accept the first part of the postcode.");
+        postcodeField.focus(); // Highlights the box for them
+        return; // Stops the function here, so they can't proceed
+    }
+
+    // 3. If we passed both checks, proceed to the next step
+    document.getElementById('phase1-container').classList.add('hidden');
+    document.getElementById('phase2-container').classList.remove('hidden');
+    
+    // Update the UI badges
+    document.getElementById('badge-step2').classList.replace('bg-gray-800', 'bg-yellow-500');
+    document.getElementById('badge-step2').classList.replace('text-gray-400', 'text-gray-900');
+    document.getElementById('text-step2').classList.replace('text-gray-500', 'text-white');
+    document.getElementById('badge-step1').classList.replace('bg-yellow-500', 'bg-gray-800');
+    document.getElementById('badge-step1').classList.replace('text-gray-900', 'text-gray-400');
+    document.getElementById('text-step1').classList.replace('text-white', 'text-gray-500');
+}
 
     function goToStep1() {
         document.getElementById('phase2-container').classList.add('hidden');
         document.getElementById('phase1-container').classList.remove('hidden');
-        
-        // Revert UI Badges back to Step 1
-        document.getElementById('badge-step1').classList.replace('bg-gray-800', 'bg-yellow-500');
-        document.getElementById('badge-step1').classList.replace('text-gray-400', 'text-gray-900');
-        document.getElementById('text-step1').classList.replace('text-gray-500', 'text-white');
-        document.getElementById('badge-step2').classList.replace('bg-yellow-500', 'bg-gray-800');
-        document.getElementById('badge-step2').classList.replace('text-gray-900', 'text-gray-400');
-        document.getElementById('text-step2').classList.replace('text-white', 'text-gray-500');
+        // ... (rest of your step navigation logic)
     }
 
-    // 6. Submit Payload Processing
-    async function handleFormSubmit(event) {
-        event.preventDefault();
+   async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    // Collect all inputs from the form
+    const payload = {
+        username: document.getElementById('username').value.trim(),
+        postcode: document.getElementById('postcode').value.trim().toUpperCase(),
+        capacity: document.getElementById('capacity').value,
+        hasBattery: document.getElementById('hasBattery').value,
+        batterySize: document.getElementById('batterySize').value,
+        orientation: document.getElementById('orientation').value,
+        shading: document.getElementById('shading').value,
+        inverterBrand: document.getElementById('inverterBrand').value,
+        apiKeyId: document.getElementById('apiKeyId').value,
+        apiSecret: document.getElementById('apiSecret').value,
+        inverterSerial: document.getElementById('inverterSerial').value
+    };
+
+    try {
+        const response = await fetch('/api/register_user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
         
-        const payload = {
-            username: document.getElementById('username').value.trim(),
-            postcode: document.getElementById('postcode').value.trim().toUpperCase(),
-            capacity: document.getElementById('capacity').value,
-            hasBattery: document.getElementById('hasBattery').value,
-            batterySize: document.getElementById('batterySize').value,
-            orientation: document.getElementById('orientation').value,
-            shading: document.getElementById('shading').value,
-            inverterBrand: document.getElementById('inverterBrand').value,
-            apiKeyId: document.getElementById('apiKeyId').value,
-            apiSecret: document.getElementById('apiSecret').value,
-            inverterSerial: document.getElementById('inverterSerial').value
-        };
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("System linked successfully!");
+            window.location.href = "index.html";
+        } else {
+            alert(`Sync Rejected: ${result.message}`);
+        }
+    } catch (err) {
+        alert("Connection error. Ensure the backend is running.");
+    }
+}
 
         try {
+            // Note: Since this is all one app, you can use the relative path: '/api/register_user'
             const response = await fetch('/api/register_user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            
             const result = await response.json();
 
-            if (response.ok) {
+            if (response.ok && result.status === "success") {
                 alert("System linked successfully!");
                 window.location.href = "index.html";
             } else {
-                alert(`Sync Rejected: ${result.message || 'Check your configuration parameters.'}`);
+                alert(`Sync Rejected: ${result.message || 'Check keys.'}`);
             }
         } catch (err) {
-            alert("Connection error. Ensure the backend is running.");
+            alert("Connection error.");
         }
     }
 </script>
