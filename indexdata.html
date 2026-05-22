@@ -143,16 +143,17 @@
     <script>
 
         // 1. Define Supabase ONLY ONCE
-    const supabase = supabase.createClient('https://czclwtgzgndvmmzkzvhw.supabase.co', 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j');
+    const supabaseClient = supabase.createClient('https://czclwtgzgndvmmzkzvhw.supabase.co', 'sb_publishable_adGU-iSun2S6ItEH0K1UgA_QQNIec6j');
 
     // 2. Define your function
     async function checkAuthState() {
-        const { data } = await supabase.auth.getSession();
-        const container = document.getElementById('authHeaderContainer');
-        if (data.session) {
-            container.innerHTML = `<a href="dashboard.html" class="text-white hover:text-yellow-500 font-bold text-xs uppercase tracking-wide transition-colors">My Dashboard</a>`;
-        }
+    // Change 'supabase' to 'supabaseClient' here:
+    const { data } = await supabaseClient.auth.getSession(); 
+    const container = document.getElementById('authHeaderContainer');
+    if (data.session) {
+        container.innerHTML = `<a href="dashboard.html" class="text-white hover:text-yellow-500 font-bold text-xs uppercase tracking-wide transition-colors">My Dashboard</a>`;
     }
+}
         let currentSortField = 'es'; 
         let currentSortDirection = 'desc';
         let globalPostcodeData = [];
