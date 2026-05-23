@@ -17,5 +17,5 @@ Solar Circle is a proprietary project. All data, branding, and analysis shared h
 
 - **Community & Personal Use:** We encourage neighbors and individuals to use our shared data for personal learning and household research.
 - **Commercial Use:** Use of this data, our branding, or our analysis for commercial purposes (including but not limited to: lead generation, sales marketing, or industrial research) is strictly prohibited without a commercial license.
-- **Inquiries:** solarcircleuk@gmail.com
+- **Inquiries:** 
 
