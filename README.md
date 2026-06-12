@@ -17,8 +17,6 @@ LiveVolt is a proprietary project. All data, branding, and analysis shared here 
 
 - **Community & Personal Use:** We encourage neighbours and individuals to use our shared data for personal learning and household research.
 - **Commercial Use:** Use of this data, our branding, or our analysis for commercial purposes (including but not limited to: lead generation, sales marketing, or industrial research) is strictly prohibited without a commercial license.
-- **Inquiries:** <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x73;&#x6f;&#x6c;&#x61;&#x72;&#x63;&#x69;&#x72;&#x63;&#x6c;&#x65;&#x75;&#x6b;&#x40;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#x6d;">
-  <kbd>✉️ Email Me</kbd>
 </a>
 
 
